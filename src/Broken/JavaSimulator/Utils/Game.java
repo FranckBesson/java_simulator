@@ -76,6 +76,28 @@ public class Game {
         }
     }
 
+
+
+    public void sendToServer(ArrayList<Sale> sales)
+    {
+        JSONObject main = new JSONObject();
+        JSONArray temp = new JSONArray();
+        for(Sale aSlae : sales)
+        {
+            JSONObject curentSale = new JSONObject();
+            curentSale.put("player",aSlae.getPlayer());
+            curentSale.put("item",aSlae.getItem());
+            curentSale.put("quatity",aSlae.getQuantity());
+            temp.put(curentSale);
+        }
+        main.put("sales",temp);
+        try {
+            communicationModule.post("/sales",main);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private ArrayList<Item> getItems(JSONArray arrayItems)
     {
         ArrayList<Item> tempImtems = new ArrayList<>();
