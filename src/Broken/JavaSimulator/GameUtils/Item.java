@@ -11,9 +11,9 @@ public class Item {
 
     private KIND kind;
     private Coordinate location;
-    private Coordinate influence;
+    private float influence;
 
-    public Item(KIND kind, Coordinate location, Coordinate influence) {
+    public Item(KIND kind, Coordinate location, float influence) {
         this.kind = kind;
         this.location = location;
         this.influence = influence;
@@ -21,7 +21,7 @@ public class Item {
 
     @Override
     public String toString() {
-        return "Kind: "+kind+" Location: "+location.toString()+" Influence : "+ influence.toString();
+        return "Kind: "+kind+" Location: "+location.toString()+" Influence : "+ influence;
     }
 
     //**********************Getter and Setter******************************
@@ -34,7 +34,7 @@ public class Item {
         return location;
     }
 
-    public Coordinate getInfluence() {
+    public float getInfluence() {
         return influence;
     }
 }

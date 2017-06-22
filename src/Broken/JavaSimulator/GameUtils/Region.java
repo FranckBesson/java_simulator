@@ -1,5 +1,7 @@
 package Broken.JavaSimulator.GameUtils;
 
+import java.util.ArrayList;
+
 /**
  * Created by sebastien on 21/06/17.
  */
@@ -8,17 +10,29 @@ public class Region {
     private int timestamp;
 
 
-    private Bot[] bots;
-    private Player[] players;
+    private ArrayList<Bot> bots = new ArrayList<>();
+    private ArrayList<Player> players = new ArrayList<>();
 
 
     private Coordinate center;
     private Coordinate span;
 
-    public Region(String weather, int timestamp, Bot[] bots, Player[] players, Coordinate center, Coordinate span) {
+    public Region(String weather, int timestamp, ArrayList<Bot> bots, ArrayList<Player> players, Coordinate center, Coordinate span) {
         this.weather = weather;
         this.timestamp = timestamp;
         this.bots = bots;
+        this.players = players;
+        this.center = center;
+        this.span = span;
+    }
+
+    public Region(ArrayList<Player> players, Coordinate center, Coordinate span) {
+        this.players = players;
+        this.center = center;
+        this.span = span;
+    }
+
+    public void updateWhithR3(ArrayList<Player> players, Coordinate center, Coordinate span){
         this.players = players;
         this.center = center;
         this.span = span;
@@ -42,11 +56,11 @@ public class Region {
         this.timestamp = timestamp;
     }
 
-    public Bot[] getBots() {
+    public ArrayList<Bot> getBots() {
         return bots;
     }
 
-    public void setBots(Bot[] bots) {
+    public void setBots(ArrayList<Bot> bots) {
         this.bots = bots;
     }
 
@@ -66,11 +80,11 @@ public class Region {
         this.span = span;
     }
 
-    public Player[] getPlayers() {
+    public ArrayList<Player> getPlayers() {
         return players;
     }
 
-    public void setPlayers(Player[] players) {
+    public void setPlayers(ArrayList<Player> players) {
         this.players = players;
     }
 }

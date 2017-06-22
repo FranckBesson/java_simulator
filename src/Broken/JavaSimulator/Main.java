@@ -7,7 +7,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import org.json.JSONObject;
 
+import javax.swing.plaf.synth.SynthTextAreaUI;
 import java.io.IOException;
 
 public class Main extends Application {
@@ -23,8 +25,9 @@ public class Main extends Application {
 
 
     public static void main(String[] args) throws IOException {
-        Game game = new Game("http://localhost:5000");
+        Game game = new Game("https://webserverlemonade.herokuapp.com");
+        //Game game = new Game("http://localhost:5000");
         game.updateRegion();
-        launch(args);
+        //launch(args);
     }
 }

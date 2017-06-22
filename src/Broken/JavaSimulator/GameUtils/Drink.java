@@ -8,6 +8,10 @@ public class Drink {
     private float price;
 
 
+    @Override
+    public String toString() {
+        return "Name: "+name+" Price: "+price;
+    }
 
     //**********************Getter and Setter******************************
     public Drink(String name, float price) {

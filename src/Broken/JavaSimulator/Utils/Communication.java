@@ -28,10 +28,7 @@ public class Communication {
 
         URL url = new URL(urlString);
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
-
-        // By default it is GET request
         con.setRequestMethod("GET");
-
         //add request header
         con.setRequestProperty("User-Agent", USER_AGENT);
 
@@ -52,16 +49,16 @@ public class Communication {
 
         //printing result from response
         String strResp = response.toString();
-        strResp = strResp.replaceAll(" ","");
-        System.out.println(strResp);
-
+        //strResp = strResp.replaceAll("[^a-zA-Z0-9\[\]{}:,]+","");
         JSONObject all = new JSONObject(strResp);
         JSONObject map = all.getJSONObject("map");
         return map;
     }
 
+
+
     public boolean post(String path, JSONObject toSend) throws IOException {
-        String url = "http://httpbin.org/post";
+        String url = serveurAddres+path;
         URL obj = new URL(url);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 
@@ -70,7 +67,7 @@ public class Communication {
         con.setRequestProperty("User-Agent", USER_AGENT);
         con.setRequestProperty("Content-Type","application/json");
 
-        String postJsonData = "{sales:{player:test,item:test,quantity:12}}";
+        String postJsonData = toSend.toString();
 
         // Send post request
         con.setDoOutput(true);
