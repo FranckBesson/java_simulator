@@ -6,7 +6,6 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by sebastien on 21/06/17.
@@ -29,7 +28,7 @@ public class Game {
             JSONArray jsonPlayers = mapJson.getJSONArray("ranking");
             JSONObject jsonPlayerInfo = mapJson.getJSONObject("playerInfo");
             JSONObject jsonItems = mapJson.getJSONObject("itemsByPlayer");
-            JSONObject jsonDrink = mapJson.getJSONObject("drinkByPlayer");
+            JSONObject jsonDrink = mapJson.getJSONObject("drinksByPlayer");
             JSONObject regionJson = mapJson.getJSONObject("region");
             players.clear();
             for(int i = 0 ; i<jsonPlayers.length(); i++) {
@@ -49,13 +48,16 @@ public class Game {
                 System.out.println("Profit: " + curentSales);
 
                 JSONArray curentJsonItems = jsonItems.getJSONArray(curentID);
-                //System.out.println(curentJsonItems);
                 ArrayList<Item> curentItems = this.getItems(curentJsonItems);
 
+                System.out.println("Drinks Offered:");
+                ArrayList<Drink> drinksOffered = this.getDrinks(curentPlayerInfo.getJSONArray("drinksOffered"));
+
                 JSONArray curentJsonPlayerDrinks = jsonDrink.getJSONArray(curentID);
+                System.out.println("Drinks:");
                 ArrayList<Drink> curentDrinks = this.getDrinks(curentJsonPlayerDrinks);
 
-                players.add(new Player(curentID,curentCash,curentSales,curentProfit,curentDrinks,curentItems));
+                players.add(new Player(curentID,curentCash,curentSales,curentProfit,curentDrinks,curentItems,drinksOffered));
                 System.out.println();
 
 
@@ -102,9 +104,7 @@ public class Game {
         for (int j = 0; j<arrayDrinks.length(); j++)
         {
             JSONObject curentJsonDrink = arrayDrinks.getJSONObject(0);
-            Drink curentDrink = new Drink(curentJsonDrink.getString("name"),curentJsonDrink.getBigDecimal("price").floatValue());
-            if(j == 0)
-                System.out.println("Drinks:");
+            Drink curentDrink = new Drink(curentJsonDrink.getString("name"),curentJsonDrink.getBigDecimal("price").floatValue(),curentJsonDrink.getBoolean("hasAlcohol"),curentJsonDrink.getBoolean("isCold"));
             System.out.println("\t"+curentDrink.toString());
             tempDrinks.add(curentDrink);
         }

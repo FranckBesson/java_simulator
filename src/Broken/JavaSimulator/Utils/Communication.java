@@ -47,9 +47,7 @@ public class Communication {
         }
         in.close();
 
-        //printing result from response
         String strResp = response.toString();
-        //strResp = strResp.replaceAll("[^a-zA-Z0-9\[\]{}:,]+","");
         JSONObject all = new JSONObject(strResp);
         JSONObject map = all.getJSONObject("map");
         return map;

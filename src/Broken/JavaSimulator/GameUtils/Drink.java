@@ -6,6 +6,8 @@ package Broken.JavaSimulator.GameUtils;
 public class Drink {
     private String name;
     private float price;
+    private boolean hasAlcohol;
+    private boolean isCold;
 
 
     @Override
@@ -14,9 +16,13 @@ public class Drink {
     }
 
     //**********************Getter and Setter******************************
-    public Drink(String name, float price) {
+
+
+    public Drink(String name, float price, boolean hasAlcohol, boolean isCold) {
         this.name = name;
         this.price = price;
+        this.hasAlcohol = hasAlcohol;
+        this.isCold = isCold;
     }
 
     public String getName() {

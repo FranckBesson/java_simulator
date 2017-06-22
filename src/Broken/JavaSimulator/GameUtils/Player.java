@@ -12,16 +12,17 @@ public class Player {
     private float profit;
     private ArrayList<Drink> Drinks = new ArrayList<>();
     private ArrayList<Item> items = new ArrayList<>();
+    private ArrayList<Drink> drinksOffered = new ArrayList<>();
 
-    public Player(String ID, float cash, int sales, float profit, ArrayList<Drink> drinks, ArrayList<Item> items) {
+    public Player(String ID, float cash, int sales, float profit, ArrayList<Drink> drinks, ArrayList<Item> items, ArrayList<Drink> drinksOffered) {
         this.ID = ID;
         this.cash = cash;
         this.sales = sales;
         this.profit = profit;
         Drinks = drinks;
         this.items = items;
+        this.drinksOffered = drinksOffered;
     }
-
 
     //**********************Getter******************************
     public String getID() {
