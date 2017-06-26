@@ -89,7 +89,7 @@ public class Game {
             }
 
             Coordinate regionCenter = new Coordinate(regionJson.getJSONObject("center").getBigDecimal("latitude").floatValue(),regionJson.getJSONObject("center").getBigDecimal("longitude").floatValue());
-            Coordinate regionSpan = new Coordinate(regionJson.getJSONObject("span").getBigDecimal("latitude").floatValue(),regionJson.getJSONObject("span").getBigDecimal("longitude").floatValue());
+            Coordinate regionSpan = new Coordinate(regionJson.getJSONObject("span").getBigDecimal("latitudeSpan").floatValue(),regionJson.getJSONObject("span").getBigDecimal("longitudeSpan").floatValue());
             if(region == null)
                 region = new Region(players,regionCenter,regionSpan);
             else
@@ -98,8 +98,11 @@ public class Game {
 
         } catch (IOException e) {
             e.printStackTrace();
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.show();
+            Platform.runLater(()->{
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.show();
+            });
+
         }catch (JSONException e) {
             e.printStackTrace();
             if(!jsonError)
