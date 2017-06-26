@@ -6,25 +6,28 @@ import java.util.ArrayList;
  * Created by sebastien on 21/06/17.
  */
 public class Region {
-    private String weather;
+    private String weatherToday;
+    private String weatherTomorow;
+
     private int timestamp;
 
 
     private ArrayList<Bot> bots = new ArrayList<>();
-    private ArrayList<Player> players = new ArrayList<>();
+    public ArrayList<Player> players = new ArrayList<>();
 
 
     private Coordinate center;
     private Coordinate span;
 
-    public Region(String weather, int timestamp, ArrayList<Bot> bots, ArrayList<Player> players, Coordinate center, Coordinate span) {
-        this.weather = weather;
+    public Region(String weatherToday, int timestamp, ArrayList<Bot> bots, ArrayList<Player> players, Coordinate center, Coordinate span) {
+        this.weatherToday = weatherToday;
         this.timestamp = timestamp;
         this.bots = bots;
         this.players = players;
         this.center = center;
         this.span = span;
     }
+    public Region(){}
 
     public Region(ArrayList<Player> players, Coordinate center, Coordinate span) {
         this.players = players;
@@ -40,12 +43,12 @@ public class Region {
 
     //**********************Getter and Setter******************************
 
-    public String getWeather() {
-        return weather;
+    public String getWeatherToday() {
+        return weatherToday;
     }
 
-    public void setWeather(String weather) {
-        this.weather = weather;
+    public void setWeatherToday(String weatherToday) {
+        this.weatherToday = weatherToday;
     }
 
     public int getTimestamp() {
@@ -86,5 +89,13 @@ public class Region {
 
     public void setPlayers(ArrayList<Player> players) {
         this.players = players;
+    }
+
+    public String getWeatherTomorow() {
+        return weatherTomorow;
+    }
+
+    public void setWeatherTomorow(String weatherTomorow) {
+        this.weatherTomorow = weatherTomorow;
     }
 }

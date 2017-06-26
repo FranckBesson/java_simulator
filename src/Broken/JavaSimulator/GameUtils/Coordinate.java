@@ -14,7 +14,7 @@ public class Coordinate {
 
     @Override
     public String toString() {
-        return "Lat:"+latitude+" Long:"+longitude;
+        return latitude+" : "+longitude;
     }
 
     //**********************Getter and Setter******************************

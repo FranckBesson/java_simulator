@@ -1,19 +1,24 @@
 package Broken.JavaSimulator.Utils;
 
 import Broken.JavaSimulator.GameUtils.*;
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
 /**
  * Created by sebastien on 21/06/17.
  */
 public class Game {
-    Communication communicationModule;
-    Region region;
-    ArrayList<Player> players = new ArrayList<>();
+    private Communication communicationModule;
+    private Region region = new Region();
+    private ArrayList<Player> players = new ArrayList<>();
+    private Boolean jsonError = false;
 
     public Game(String serveuradrr) {
         communicationModule = new Communication(serveuradrr);
@@ -24,41 +29,61 @@ public class Game {
         try {
 
 
-            JSONObject mapJson = communicationModule.get("/map");
+            JSONObject all = communicationModule.get("/map");
+            JSONObject mapJson = all.getJSONObject("map");
             JSONArray jsonPlayers = mapJson.getJSONArray("ranking");
             JSONObject jsonPlayerInfo = mapJson.getJSONObject("playerInfo");
             JSONObject jsonItems = mapJson.getJSONObject("itemsByPlayer");
             JSONObject jsonDrink = mapJson.getJSONObject("drinksByPlayer");
             JSONObject regionJson = mapJson.getJSONObject("region");
-            players.clear();
+            region.players.clear();
             for(int i = 0 ; i<jsonPlayers.length(); i++) {
                 //get the curent player ID/name
                 String curentID =jsonPlayers.getString(i);
-                System.out.println("Player id: "+curentID);
+                System.out.println("Player id: "+curentID);float curentCash = 0;
+                float curentProfit = 0;
+                int curentSales = 0;
+                JSONObject curentPlayerInfo = null;
 
+                try{
 
-                JSONObject curentPlayerInfo = jsonPlayerInfo.getJSONObject(curentID);
-                float curentCash = curentPlayerInfo.getBigDecimal("cash").floatValue();
-                System.out.println("Cash: " +curentCash);
+                    curentPlayerInfo = jsonPlayerInfo.getJSONObject(curentID);
+                    curentCash = curentPlayerInfo.getBigDecimal("cash").floatValue();
+                    System.out.println("Cash: " +curentCash);
+                    curentProfit = curentPlayerInfo.getBigDecimal("profit").floatValue();
+                    System.out.println("Profit: " + curentProfit);
+                    curentSales = curentPlayerInfo.getInt("sales");
+                    System.out.println("Profit: " + curentSales);
+                }catch (JSONException e) {
+                    System.err.println(e.getMessage());
+                }
 
-                float curentProfit = curentPlayerInfo.getBigDecimal("profit").floatValue();
-                System.out.println("Profit: " + curentProfit);
+                ArrayList<Item> curentItems = new ArrayList<>();
+                try {
+                    JSONArray curentJsonItems = jsonItems.getJSONArray(curentID);
+                    curentItems = this.getItems(curentJsonItems);
+                }catch (JSONException e){
+                    System.err.println(e.getMessage());
+                }
 
-                int curentSales = curentPlayerInfo.getInt("sales");
-                System.out.println("Profit: " + curentSales);
-
-                JSONArray curentJsonItems = jsonItems.getJSONArray(curentID);
-                ArrayList<Item> curentItems = this.getItems(curentJsonItems);
 
                 System.out.println("Drinks Offered:");
-                ArrayList<Drink> drinksOffered = this.getDrinks(curentPlayerInfo.getJSONArray("drinksOffered"));
+                ArrayList<Drink> drinksOffered = new ArrayList<>();
+                if(curentPlayerInfo != null)
+                    drinksOffered = this.getDrinks(curentPlayerInfo.getJSONArray("drinksOffered"));
 
-                JSONArray curentJsonPlayerDrinks = jsonDrink.getJSONArray(curentID);
-                System.out.println("Drinks:");
-                ArrayList<Drink> curentDrinks = this.getDrinks(curentJsonPlayerDrinks);
+                ArrayList<Drink> curentDrinks = new ArrayList<>();
+                try{
+                    JSONArray curentJsonPlayerDrinks = jsonDrink.getJSONArray(curentID);
+                    System.out.println("Drinks:");
+                    curentDrinks = this.getDrinks(curentJsonPlayerDrinks);
+                }catch (JSONException e)
+                {
+                    System.err.println(e.getMessage());
+                }
 
-                players.add(new Player(curentID,curentCash,curentSales,curentProfit,curentDrinks,curentItems,drinksOffered));
-                System.out.println();
+
+                region.players.add(new Player(curentID,curentCash,curentSales,curentProfit,curentDrinks,curentItems,drinksOffered));
 
 
             }
@@ -71,6 +96,43 @@ public class Game {
                 region.updateWhithR3(players,regionCenter,regionSpan);
 
 
+        } catch (IOException e) {
+            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.show();
+        }catch (JSONException e) {
+            e.printStackTrace();
+            if(!jsonError)
+                Platform.runLater(()->{
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setContentText("Error while decripting JSON response");
+                    alert.setHeaderText("Communication Error !");
+                    alert.show();
+                });
+            jsonError = true;
+
+        }
+
+    }
+
+    public void updateTime(){
+        try {
+            JSONObject r7 = communicationModule.get("/metrology");
+            region.setTimestamp(r7.getBigDecimal("timestamp").intValue());
+            JSONArray weather = r7.getJSONArray("weather");
+            for(int i = 0; i<weather.length();i++)
+            {
+                JSONObject aWeather = weather.getJSONObject(i);
+                if(aWeather.getBigDecimal("dfn").intValue() == 0){
+                    region.setWeatherToday(aWeather.getString("weather"));
+                }
+                else
+                {
+                    region.setWeatherTomorow(aWeather.getString("weather"));
+                }
+            }
+
+            
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -105,7 +167,7 @@ public class Game {
         {
             JSONObject curentIT = arrayItems.getJSONObject(j);
             Item.KIND curentKind;
-            if(curentIT.get("kind").equals("ad"))
+            if(curentIT.get("kind").equals("AD"))
                 curentKind = Item.KIND.AD;
             else
                 curentKind = Item.KIND.STAND;
@@ -133,4 +195,7 @@ public class Game {
         return tempDrinks;
     }
 
+    public Region getRegion() {
+        return region;
+    }
 }

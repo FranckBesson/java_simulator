@@ -48,9 +48,11 @@ public class Communication {
         in.close();
 
         String strResp = response.toString();
+
+        System.out.println(strResp);
         JSONObject all = new JSONObject(strResp);
-        JSONObject map = all.getJSONObject("map");
-        return map;
+
+        return all;
     }
 
 

@@ -33,4 +33,11 @@ public class Drink {
         return price;
     }
 
+    public boolean HasAlcohol() {
+        return hasAlcohol;
+    }
+
+    public boolean isCold() {
+        return isCold;
+    }
 }

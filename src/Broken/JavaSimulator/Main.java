@@ -3,6 +3,8 @@ package Broken.JavaSimulator;
 import Broken.JavaSimulator.GameUtils.Sale;
 import Broken.JavaSimulator.Utils.Game;
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -11,8 +13,10 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class Main extends Application {
 
+
+public class Main extends Application {
+    public static Game game = new Game("https://webserverlemonade.herokuapp.com");
     @Override
     public void start(Stage primaryStage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getResource("MainScreen.fxml"));
@@ -25,14 +29,9 @@ public class Main extends Application {
 
 
     public static void main(String[] args) throws IOException {
-        Game game = new Game("https://webserverlemonade.herokuapp.com");
 //        Game game = new Game("http://localhost:5000");
-//        game.updateRegion();
-        ArrayList<Sale> test = new ArrayList<>();
-        test.add(new Sale("test","truc",10));
-        test.add(new Sale("test1","truc1",101));
-        test.add(new Sale("test2","truc2",1021));
-        game.sendToServer(test);
+        game.updateRegion();
+        game.updateTime();
         launch(args);
     }
 }
