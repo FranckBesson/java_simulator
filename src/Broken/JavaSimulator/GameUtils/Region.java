@@ -8,13 +8,10 @@ import java.util.ArrayList;
 public class Region {
     private String weatherToday;
     private String weatherTomorow;
-
     private int timestamp;
-
 
     private ArrayList<Bot> bots = new ArrayList<>();
     public ArrayList<Player> players = new ArrayList<>();
-
 
     private Coordinate center;
     private Coordinate span;

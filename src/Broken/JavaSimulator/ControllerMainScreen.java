@@ -4,6 +4,8 @@ import Broken.JavaSimulator.GameUtils.Drink;
 import Broken.JavaSimulator.GameUtils.Item;
 import Broken.JavaSimulator.GameUtils.Player;
 import Broken.JavaSimulator.GameUtils.Region;
+import Broken.JavaSimulator.Utils.Simulation;
+import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -132,61 +134,57 @@ public class ControllerMainScreen implements Initializable{
 
 
     public void update(){
-        Region region = Main.game.getRegion();
-        TreeItem<String> rootTree = treeView.getRoot();
-        rootTree.getChildren().clear();
-        for (Player aPlayer : region.getPlayers()){
-            TreeItem<String> playerItem = new TreeItem<>(aPlayer.getID());
-            TreeItem<String> cash = new TreeItem<>("Cash: "+aPlayer.getCash());
-            TreeItem<String> sales= new TreeItem<>("Sales: "+aPlayer.getSales());
-            TreeItem<String> profit = new TreeItem<>("Profit: "+aPlayer.getProfit());
-            TreeItem<String> stands = new TreeItem<>("Stand");
-            TreeItem<String> ads = new TreeItem<>("Ads");
-            int iStand = 1;
-            int iAd = 1;
-            for(Item aItem : aPlayer.getItems()){
-                TreeItem<String> poss = new TreeItem<>("Position: "+aItem.getLocation().toString());
-                TreeItem<String> inf = new TreeItem<>("Influence: "+aItem.getInfluence());
+        Platform.runLater(()->{
+            Region region = Main.game.getRegion();
+            TreeItem<String> rootTree = treeView.getRoot();
+            rootTree.getChildren().clear();
+            for (Player aPlayer : region.getPlayers()) {
+                TreeItem<String> playerItem = new TreeItem<>(aPlayer.getID());
+                TreeItem<String> cash = new TreeItem<>("Cash: " + aPlayer.getCash());
+                TreeItem<String> sales = new TreeItem<>("Sales: " + aPlayer.getSales());
+                TreeItem<String> profit = new TreeItem<>("Profit: " + aPlayer.getProfit());
+                TreeItem<String> stands = new TreeItem<>("Stand");
+                TreeItem<String> ads = new TreeItem<>("Ads");
+                int iStand = 1;
+                int iAd = 1;
+                for (Item aItem : aPlayer.getItems()) {
+                    TreeItem<String> poss = new TreeItem<>("Position: " + aItem.getLocation().toString());
+                    TreeItem<String> inf = new TreeItem<>("Influence: " + aItem.getInfluence());
 
 
-                if(aItem.getKind() == Item.KIND.AD)
-                {
-                    TreeItem<String> node = new TreeItem<>(""+iAd);
-                    node.getChildren().addAll(poss,inf);
-                    ads.getChildren().add(node);
-                    iAd++;
+                    if (aItem.getKind() == Item.KIND.AD) {
+                        TreeItem<String> node = new TreeItem<>("" + iAd);
+                        node.getChildren().addAll(poss, inf);
+                        ads.getChildren().add(node);
+                        iAd++;
+                    } else {
+                        TreeItem<String> node = new TreeItem<>("" + iStand);
+                        node.getChildren().addAll(poss, inf);
+                        stands.getChildren().add(node);
+                        iStand++;
+                    }
+                }
+                TreeItem<String> drinks = new TreeItem<>("Drinks");
+                for (Drink aDrink : aPlayer.getDrinks()) {
+                    TreeItem<String> price = new TreeItem<>("Price: " + aDrink.getPrice() + "€");
+                    TreeItem<String> hasAlcohol = new TreeItem<>("Has Alcohol: " + aDrink.HasAlcohol());
+                    TreeItem<String> isCold = new TreeItem<>("Is Cold: " + aDrink.isCold());
+                    TreeItem<String> node = new TreeItem<>(aDrink.getName());
+                    node.getChildren().addAll(price, hasAlcohol, isCold);
+                    drinks.getChildren().add(node);
                 }
 
-                else{
-                    TreeItem<String> node = new TreeItem<>(""+iStand);
-                    node.getChildren().addAll(poss,inf);
-                    stands.getChildren().add(node);
-                    iStand++;
-                }
+                playerItem.getChildren().addAll(cash, sales, profit, ads, stands);
+                rootTree.getChildren().add(playerItem);
+
+                weatherToday.setText(region.getWeatherToday());
+                weatherTomorrow.setText(region.getWeatherTomorow());
+                int dayCompt = region.getTimestamp() / 24;
+                int timeCompt = region.getTimestamp() % 24;
+                day.setText("" + dayCompt);
+                time.setText("" + timeCompt + ":00");
             }
-            TreeItem<String> drinks = new TreeItem<>("Drinks");
-            for(Drink aDrink : aPlayer.getDrinks()){
-                TreeItem<String> price = new TreeItem<>("Price: "+aDrink.getPrice()+"€");
-                TreeItem<String> hasAlcohol = new TreeItem<>("Has Alcohol: "+aDrink.HasAlcohol());
-                TreeItem<String> isCold = new TreeItem<>("Is Cold: "+aDrink.isCold());
-                TreeItem<String> node = new TreeItem<>(aDrink.getName());
-                node.getChildren().addAll(price,hasAlcohol,isCold);
-                drinks.getChildren().add(node);
-            }
-
-            playerItem.getChildren().addAll(cash,sales,profit,ads,stands);
-            rootTree.getChildren().add(playerItem);
-
-            weatherToday.setText(region.getWeatherToday());
-            weatherTomorrow.setText(region.getWeatherTomorow());
-            int dayCompt = region.getTimestamp()/24;
-            int timeCompt = region.getTimestamp()%24;
-            day.setText(""+dayCompt);
-            time.setText(""+timeCompt+":00");
-
-
-        }
-
+        });
     }
 
     //Thread wait for screen stabilisation
@@ -216,6 +214,7 @@ public class ControllerMainScreen implements Initializable{
             {
                 Main.game.updateTime();
                 Main.game.updateRegion();
+                new Simulation().placeBot(100,Main.game.getRegion());
                 update();
                 try {
                     Thread.sleep(500);

@@ -6,7 +6,9 @@ package Broken.JavaSimulator.GameUtils;
 public class Bot {
     private Coordinate location;
 
-
+    public Bot(Coordinate location) {
+        this.location = location;
+    }
 
     //**********************Getter and Setter******************************
     public Coordinate getLocation() {

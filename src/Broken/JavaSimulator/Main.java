@@ -16,7 +16,7 @@ import java.util.ArrayList;
 
 
 public class Main extends Application {
-    public static Game game = new Game("https://webserverlemonade.herokuapp.com");
+    public static Game game = new Game("http://localhost:5000");
     @Override
     public void start(Stage primaryStage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getResource("MainScreen.fxml"));
