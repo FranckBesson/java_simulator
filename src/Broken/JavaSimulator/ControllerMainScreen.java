@@ -144,12 +144,14 @@ public class ControllerMainScreen implements Initializable{
             Region region = Main.game.getRegion();
             TreeItem<String> rootTree = treeView.getRoot();
             for (Player aPlayer : region.getPlayers()) {
-                try {
-                    TreeItem<String> test = TreeViewUtils.getPlayerBranch(rootTree, aPlayer.getID());
-                } catch (PlayerNotFound playerNotFound) {
-                    playerNotFound.printStackTrace();
-                }
+                TreeViewUtils.updatePlayerBranche(rootTree,aPlayer);
             }
+            weatherToday.setText(region.getWeatherToday());
+            weatherTomorrow.setText(region.getWeatherTomorow());
+            int dayCompt = region.getTimestamp() / 24;
+            int timeCompt = region.getTimestamp() % 24;
+            day.setText("" + dayCompt);
+            time.setText("" + timeCompt + ":00");
 //            rootTree.getChildren().clear();
 //            for (Player aPlayer : region.getPlayers()) {
 //                TreeItem<String> playerItem = new TreeItem<>(aPlayer.getID());
@@ -190,19 +192,8 @@ public class ControllerMainScreen implements Initializable{
 //                playerItem.getChildren().addAll(cash, sales, profit, ads, stands);
 //                rootTree.getChildren().add(playerItem);
 //
-//                weatherToday.setText(region.getWeatherToday());
-//                weatherTomorrow.setText(region.getWeatherTomorow());
-//                int dayCompt = region.getTimestamp() / 24;
-//                int timeCompt = region.getTimestamp() % 24;
-//                day.setText("" + dayCompt);
-//                time.setText("" + timeCompt + ":00");
+//
 //        }
-            try {
-                TreeItem<String> test = TreeViewUtils.getPlayerBranch(rootTree, "Louis");
-                test.setValue("test");
-            } catch (PlayerNotFound playerNotFound) {
-                playerNotFound.printStackTrace();
-            }
         });
 
     }

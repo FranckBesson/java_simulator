@@ -19,6 +19,7 @@ public class Game {
     private Region region = new Region();
     private ArrayList<Player> players = new ArrayList<>();
     private Boolean jsonError = false;
+    private Boolean comError = false;
 
     public Game(String serveuradrr) {
         communicationModule = new Communication(serveuradrr);
@@ -96,10 +97,15 @@ public class Game {
 
         } catch (IOException e) {
             e.printStackTrace();
-            Platform.runLater(()->{
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.show();
-            });
+            if(!comError){
+                Platform.runLater(()->{
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setHeaderText("Communication error!");
+                    alert.show();
+                });
+                comError = true;
+            }
+
 
         }catch (JSONException e) {
             e.printStackTrace();
