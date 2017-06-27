@@ -1,6 +1,7 @@
 package Broken.JavaSimulator.Utils;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -23,7 +24,7 @@ public class Communication {
     }
 
 
-    public JSONObject get(String path) throws IOException {
+    public JSONObject get(String path) throws IOException,JSONException {
         String urlString = serveurAddres+path;
 
         URL url = new URL(urlString);
@@ -49,7 +50,7 @@ public class Communication {
 
         String strResp = response.toString();
 
-        System.out.println(strResp);
+        //System.out.println(strResp);
         JSONObject all = new JSONObject(strResp);
 
         return all;

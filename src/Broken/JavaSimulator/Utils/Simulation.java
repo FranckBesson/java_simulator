@@ -1,8 +1,8 @@
 package Broken.JavaSimulator.Utils;
 
 import Broken.JavaSimulator.GameUtils.*;
+import Broken.JavaSimulator.Utils.Exception.NoStandException;
 
-import javax.swing.plaf.synth.SynthTextAreaUI;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,11 +15,11 @@ public class Simulation {
     HashMap<String,Double> weatherProb = new HashMap<>();
 
     public Simulation() {
-        weatherProb.put("thunderstorm",0.0);
-        weatherProb.put("rainy",0.15);
-        weatherProb.put("cloudy",0.3);
-        weatherProb.put("sunny",0.75);
-        weatherProb.put("heatwave",1.0);
+        weatherProb.put("THUNDERSTORM",0.0);
+        weatherProb.put("RAINY",0.15);
+        weatherProb.put("CLOUDY",0.3);
+        weatherProb.put("SUNNY",0.75);
+        weatherProb.put("HEATWAVE",1.0);
     }
 
     public void placeBot(int nbrOfBot, Region region){
@@ -27,15 +27,14 @@ public class Simulation {
         region.getBots().clear();
         for(int i = 0; i<nbrOfBot; i++)
         {
-            BigDecimal lattitude = BigDecimal.valueOf(Math.random()*(region.getSpan().getLatitude()*2));
-            BigDecimal longitude = BigDecimal.valueOf(Math.random()*(region.getSpan().getLongitude()*2));
+            BigDecimal lattitude = BigDecimal.valueOf(Math.random()*(region.getSpan().getLatitude()));
+            BigDecimal longitude = BigDecimal.valueOf(Math.random()*(region.getSpan().getLongitude()));
             region.getBots().add(new Bot(new Coordinate(lattitude.floatValue(),longitude.floatValue())));
         }
 
         for(Bot aBot : region.getBots()){
-            System.out.println(aBot.getLocation().toString());
+            //System.out.println(aBot.getLocation().toString());
         }
-        System.out.println("distance : "+checkDistance(region.getPlayers().get(0).getItems().get(0),region.getBots().get(0)));
 
     }
 
@@ -46,41 +45,59 @@ public class Simulation {
     }
 
 
-    public void simulate(Region region){
+    public ArrayList<Sale> simulate(Region region){
         placeBot(20,region);
         ArrayList<Player> players = region.getPlayers();
         ArrayList<Bot> bots = region.getBots();
         HashMap<Player,Integer> botDispatch = new HashMap<>();
         for(Bot abot : bots) {
-            float oldDistance = Float.MAX_VALUE;
-            Player savedPlayers = null;
-            for (Player aPlayer : players) {
-                float distance = checkDistance(aPlayer.getItems().get(0), abot);
-                if (distance < oldDistance) {
-                    savedPlayers = aPlayer;
-                    oldDistance = distance;
+
+                float oldDistance = Float.MAX_VALUE;
+                Player savedPlayers = null;
+                for (Player aPlayer : region.getPlayers()) {
+                    try {
+                        float distance = checkDistance(aPlayer.getStand(), abot);
+                        if (distance < oldDistance) {
+                            savedPlayers = aPlayer;
+                            oldDistance = distance;
+                        }
+                    } catch (NoStandException e) {
+                    }
                 }
-            }
-            if (botDispatch.containsKey(savedPlayers))
-                botDispatch.replace(savedPlayers, botDispatch.get(savedPlayers) + 1);
-            else
-                botDispatch.put(savedPlayers, 1);
+                if (botDispatch.containsKey(savedPlayers))
+                    botDispatch.replace(savedPlayers, botDispatch.get(savedPlayers) + 1);
+                else
+                    botDispatch.put(savedPlayers, 1);
+
+
         }
 
         Double todayProb = weatherProb.get(region.getWeatherToday());
-
+        HashMap<String,Sale> sales = new HashMap<>();
         for(Map.Entry<Player, Integer> entry : botDispatch.entrySet()) {
             Player key = entry.getKey();
             Integer value = entry.getValue();
+            System.out.println("Before Prob -> "+key.getID()+" : "+value);
 
             for(int i = 0; i<value; i++){
-               //TODO Finish proba
+               if(Math.random()>todayProb){
+                   if(!sales.containsKey(key.getID())){
+                       sales.put(key.getID(),new Sale(key.getID(),key.getDrinks().get(0).getName(),1));
+                   }
+                   else
+                       sales.get(key.getID()).increment();
+
+               }
             }
+            if(sales.containsKey(key.getID()))
+                System.out.println("After prob: "+sales.get(key.getID()).getPlayer()+" : "+sales.get(key.getID()).getQuantity());
+            else
+                System.out.println("After prob: "+key.getID()+" : 0");
 
-            // do what you have to do here
-            // In your case, an other loop.
         }
-
+        ArrayList<Sale> salesArry = new ArrayList<>();
+        salesArry.addAll(sales.values());
+        return salesArry;
     }
 
 

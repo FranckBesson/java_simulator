@@ -25,4 +25,8 @@ public class Sale {
     public int getQuantity() {
         return quantity;
     }
+
+    public void increment(){
+        this.quantity++;
+    }
 }

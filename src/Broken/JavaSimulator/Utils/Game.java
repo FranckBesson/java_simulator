@@ -40,7 +40,8 @@ public class Game {
             for(int i = 0 ; i<jsonPlayers.length(); i++) {
                 //get the curent player ID/name
                 String curentID =jsonPlayers.getString(i);
-                System.out.println("Player id: "+curentID);float curentCash = 0;
+                System.out.println("Player id: "+curentID);
+                float curentCash = 0;
                 float curentProfit = 0;
                 int curentSales = 0;
                 JSONObject curentPlayerInfo = null;
@@ -49,13 +50,13 @@ public class Game {
 
                     curentPlayerInfo = jsonPlayerInfo.getJSONObject(curentID);
                     curentCash = curentPlayerInfo.getBigDecimal("cash").floatValue();
-                    System.out.println("Cash: " +curentCash);
+                    //System.out.println("Cash: " +curentCash);
                     curentProfit = curentPlayerInfo.getBigDecimal("profit").floatValue();
-                    System.out.println("Profit: " + curentProfit);
+                   // System.out.println("Profit: " + curentProfit);
                     curentSales = curentPlayerInfo.getInt("sales");
-                    System.out.println("Profit: " + curentSales);
+                    //System.out.println("Profit: " + curentSales);
                 }catch (JSONException e) {
-                    System.err.println(e.getMessage());
+                    e.printStackTrace();
                 }
 
                 ArrayList<Item> curentItems = new ArrayList<>();
@@ -66,8 +67,6 @@ public class Game {
                     System.err.println(e.getMessage());
                 }
 
-
-                System.out.println("Drinks Offered:");
                 ArrayList<Drink> drinksOffered = new ArrayList<>();
                 if(curentPlayerInfo != null)
                     drinksOffered = this.getDrinks(curentPlayerInfo.getJSONArray("drinksOffered"));
@@ -75,7 +74,6 @@ public class Game {
                 ArrayList<Drink> curentDrinks = new ArrayList<>();
                 try{
                     JSONArray curentJsonPlayerDrinks = jsonDrink.getJSONArray(curentID);
-                    System.out.println("Drinks:");
                     curentDrinks = this.getDrinks(curentJsonPlayerDrinks);
                 }catch (JSONException e)
                 {
@@ -136,7 +134,7 @@ public class Game {
             }
 
             
-        } catch (IOException e) {
+        } catch (IOException | JSONException e) {
             e.printStackTrace();
         }
     }
@@ -175,9 +173,9 @@ public class Game {
             else
                 curentKind = Item.KIND.STAND;
             tempImtems.add(new Item(curentKind,new Coordinate(curentIT.getJSONObject("location").getBigDecimal("latitude").floatValue(),curentIT.getJSONObject("location").getBigDecimal("longitude").floatValue()),curentIT.getBigDecimal("influence").floatValue()));
-            if(j == 0)
+            /*if(j == 0)
                 System.out.println("Items:");
-            System.out.println("\t"+tempImtems.get(j).toString());
+            System.out.println("\t"+tempImtems.get(j).toString());*/
         }
         return tempImtems;
     }
@@ -186,13 +184,13 @@ public class Game {
 
 
     private ArrayList<Drink> getDrinks(JSONArray arrayDrinks)
-    {   //TODO Modification du protocol !!!!!!!
+    {
         ArrayList<Drink> tempDrinks = new ArrayList<>();
         for (int j = 0; j<arrayDrinks.length(); j++)
         {
             JSONObject curentJsonDrink = arrayDrinks.getJSONObject(0);
             Drink curentDrink = new Drink(curentJsonDrink.getString("name"),curentJsonDrink.getBigDecimal("price").floatValue(),curentJsonDrink.getBoolean("hasAlcohol"),curentJsonDrink.getBoolean("isCold"));
-            System.out.println("\t"+curentDrink.toString());
+            //System.out.println("\t"+curentDrink.toString());
             tempDrinks.add(curentDrink);
         }
         return tempDrinks;
@@ -200,5 +198,27 @@ public class Game {
 
     public Region getRegion() {
         return region;
+    }
+
+
+    public void formatAndSendSales(ArrayList<Sale> sales){
+        JSONArray salesArray  = new JSONArray();
+        for(Sale aSale : sales){
+            JSONObject curentSale = new JSONObject();
+            curentSale.put("player",aSale.getPlayer());
+            curentSale.put("item",aSale.getItem());
+            curentSale.put("quantity",aSale.getQuantity());
+            salesArray.put(curentSale);
+        }
+        JSONObject salesMain = new JSONObject();
+        salesMain.put("sales",salesArray);
+
+        try {
+            communicationModule.post("/sales",salesMain);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
     }
 }

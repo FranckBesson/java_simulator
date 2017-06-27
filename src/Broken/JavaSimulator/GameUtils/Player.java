@@ -1,5 +1,8 @@
 package Broken.JavaSimulator.GameUtils;
 
+import Broken.JavaSimulator.Utils.Exception.NoAdFound;
+import Broken.JavaSimulator.Utils.Exception.NoStandException;
+
 import java.util.ArrayList;
 
 /**
@@ -47,5 +50,25 @@ public class Player {
 
     public ArrayList<Item> getItems() {
         return items;
+    }
+
+    public Item getStand() throws NoStandException {
+        for(Item unItem : items){
+            if(unItem.getKind() == Item.KIND.STAND)
+                return unItem;
+        }
+        throw new NoStandException();
+    }
+
+    public ArrayList<Item> getAds() throws NoAdFound {
+        ArrayList<Item> temp = new ArrayList<>();
+        for(Item unItem : items){
+            if(unItem.getKind() == Item.KIND.AD)
+                temp.add(unItem);
+        }
+        if(temp.size() != 0){
+            return temp;
+        }
+        throw new NoAdFound();
     }
 }

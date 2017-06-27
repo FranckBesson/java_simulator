@@ -1,5 +1,7 @@
 package Broken.JavaSimulator.GameUtils;
 
+import Broken.JavaSimulator.Utils.Exception.PlayerNotFound;
+
 import java.util.ArrayList;
 
 /**
@@ -50,6 +52,15 @@ public class Region {
 
     public int getTimestamp() {
         return timestamp;
+    }
+
+    public Player getPlayerById(String id) throws PlayerNotFound {
+        for(Player aPlayer : players){
+            if(aPlayer.getID().equals(id)){
+                return aPlayer;
+            }
+        }
+        throw new PlayerNotFound();
     }
 
     public void setTimestamp(int timestamp) {
