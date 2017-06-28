@@ -129,6 +129,7 @@ public class TreeViewUtils {
             }
 
         }
+
     }
 
     private static void addAd(TreeItem<String> adsBranch, Item ad){
@@ -138,6 +139,21 @@ public class TreeViewUtils {
         TreeItem<String> ads = new TreeItem<>(String.valueOf(size+1));
         ads.getChildren().addAll(poss,inf);
         adsBranch.getChildren().add(ads);
+    }
+
+    public static void checkAndDelExedent(TreeItem<String> root, ArrayList<Player> playerInfo){
+        ObservableList<TreeItem<String>> playersBranch = root.getChildren();
+        for(TreeItem<String> aBranch : playersBranch){
+            boolean find = false;
+            for(Player aPlayer : playerInfo){
+                if(aPlayer.getID().equals(aBranch.getValue()))
+                    find = true;
+                    break;
+            }
+            if (!find){
+                playersBranch.removeAll(aBranch);
+            }
+        }
     }
 
 

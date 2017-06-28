@@ -12,7 +12,7 @@ import java.util.Map;
  * Created by sebastien on 26/06/17.
  */
 public class Simulation {
-    HashMap<String,Double> weatherProb = new HashMap<>();
+    private HashMap<String,Double> weatherProb = new HashMap<>();
 
     public Simulation() {
         weatherProb.put("THUNDERSTORM",0.0);
@@ -22,7 +22,7 @@ public class Simulation {
         weatherProb.put("HEATWAVE",1.0);
     }
 
-    public void placeBot(int nbrOfBot, Region region){
+    private void placeBot(int nbrOfBot, Region region){
 
         region.getBots().clear();
         for(int i = 0; i<nbrOfBot; i++)
@@ -38,7 +38,7 @@ public class Simulation {
 
     }
 
-    public float checkDistance(Item stand, Bot abot)
+    private float checkDistance(Item stand, Bot abot)
     {
         float distance = (float) Math.sqrt(Math.pow(stand.getLocation().getLatitude()-abot.getLocation().getLatitude(),2)+Math.pow(stand.getLocation().getLongitude()-abot.getLocation().getLongitude(),2));
         return distance;

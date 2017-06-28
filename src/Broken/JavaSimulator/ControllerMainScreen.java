@@ -146,6 +146,7 @@ public class ControllerMainScreen implements Initializable{
             for (Player aPlayer : region.getPlayers()) {
                 TreeViewUtils.updatePlayerBranche(rootTree,aPlayer);
             }
+            TreeViewUtils.checkAndDelExedent(rootTree,region.getPlayers());
             weatherToday.setText(region.getWeatherToday());
             weatherTomorrow.setText(region.getWeatherTomorow());
             int dayCompt = region.getTimestamp() / 24;
@@ -258,15 +259,14 @@ public class ControllerMainScreen implements Initializable{
             while(true)
             {
                 Main.game.updateTime();
-                Main.game.getRegion().setWeatherToday("SUNNY");
                 Main.game.updateRegion();
+                if(Main.game.isNewDay()){
+                    Main.game.getSimulationModule().simulate(Main.game.getRegion());
+                }
                 updateCanvas();
-
-//                ArrayList<Sale> sales = new Simulation().simulate(Main.game.getRegion());
-//                Main.game.formatAndSendSales(sales);
                 update();
                 try {
-                    Thread.sleep(1500);
+                    Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

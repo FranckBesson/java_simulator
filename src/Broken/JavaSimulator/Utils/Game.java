@@ -16,13 +16,19 @@ import java.util.ArrayList;
  */
 public class Game {
     private Communication communicationModule;
+    private Simulation simulationModule;
     private Region region = new Region();
     private ArrayList<Player> players = new ArrayList<>();
     private Boolean jsonError = false;
     private Boolean comError = false;
+    private int savedDay = 1;
+
+
 
     public Game(String serveuradrr) {
         communicationModule = new Communication(serveuradrr);
+        simulationModule = new Simulation();
+
     }
 
     public void updateRegion()
@@ -179,33 +185,10 @@ public class Game {
             else
                 curentKind = Item.KIND.STAND;
             tempImtems.add(new Item(curentKind,new Coordinate(curentIT.getJSONObject("location").getBigDecimal("latitude").floatValue(),curentIT.getJSONObject("location").getBigDecimal("longitude").floatValue()),curentIT.getBigDecimal("influence").floatValue()));
-            /*if(j == 0)
-                System.out.println("Items:");
-            System.out.println("\t"+tempImtems.get(j).toString());*/
+
         }
         return tempImtems;
     }
-
-
-
-
-    private ArrayList<Drink> getDrinks(JSONArray arrayDrinks)
-    {
-        ArrayList<Drink> tempDrinks = new ArrayList<>();
-        for (int j = 0; j<arrayDrinks.length(); j++)
-        {
-            JSONObject curentJsonDrink = arrayDrinks.getJSONObject(0);
-            Drink curentDrink = new Drink(curentJsonDrink.getString("name"),curentJsonDrink.getBigDecimal("price").floatValue(),curentJsonDrink.getBoolean("hasAlcohol"),curentJsonDrink.getBoolean("isCold"));
-            //System.out.println("\t"+curentDrink.toString());
-            tempDrinks.add(curentDrink);
-        }
-        return tempDrinks;
-    }
-
-    public Region getRegion() {
-        return region;
-    }
-
 
     public void formatAndSendSales(ArrayList<Sale> sales){
         JSONArray salesArray  = new JSONArray();
@@ -226,5 +209,36 @@ public class Game {
         }
 
 
+    }
+
+    public Boolean isNewDay(){
+        int day = region.getTimestamp() / 24;
+        if(day != savedDay){
+            savedDay = day;
+            return true;
+        }
+        return false;
+    }
+
+
+    private ArrayList<Drink> getDrinks(JSONArray arrayDrinks)
+    {
+        ArrayList<Drink> tempDrinks = new ArrayList<>();
+        for (int j = 0; j<arrayDrinks.length(); j++)
+        {
+            JSONObject curentJsonDrink = arrayDrinks.getJSONObject(0);
+            Drink curentDrink = new Drink(curentJsonDrink.getString("name"),curentJsonDrink.getBigDecimal("price").floatValue(),curentJsonDrink.getBoolean("hasAlcohol"),curentJsonDrink.getBoolean("isCold"));
+            //System.out.println("\t"+curentDrink.toString());
+            tempDrinks.add(curentDrink);
+        }
+        return tempDrinks;
+    }
+
+    public Region getRegion() {
+        return region;
+    }
+
+    public Simulation getSimulationModule() {
+        return simulationModule;
     }
 }
