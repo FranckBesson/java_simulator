@@ -21,7 +21,8 @@ public class Game {
     private ArrayList<Player> players = new ArrayList<>();
     private Boolean jsonError = false;
     private Boolean comError = false;
-    private int savedDay = 1;
+    private int savedHour = 1;
+    private boolean flagDay = false;
 
 
 
@@ -31,7 +32,7 @@ public class Game {
 
     }
 
-    public void updateRegion()
+    public boolean updateRegion()
     {
         try {
 
@@ -47,7 +48,7 @@ public class Game {
             for(int i = 0 ; i<jsonPlayers.length(); i++) {
                 //get the curent player ID/name
                 String curentID =jsonPlayers.getString(i);
-                System.out.println("Player id: "+curentID);
+//                System.out.println("Player id: "+curentID);
                 float curentCash = 0;
                 float curentProfit = 0;
                 int curentSales = 0;
@@ -100,7 +101,7 @@ public class Game {
             else
                 region.updateWhithR3(players,regionCenter,regionSpan);
 
-
+            return true;
         } catch (IOException e) {
             e.printStackTrace();
             if(!comError){
@@ -110,7 +111,9 @@ public class Game {
                     alert.show();
                 });
                 comError = true;
+
             }
+            return false;
 
 
         }catch (JSONException e) {
@@ -123,12 +126,13 @@ public class Game {
                     alert.show();
                 });
             jsonError = true;
+            return false;
 
         }
 
     }
 
-    public void updateTime(){
+    public boolean updateTime(){
         try {
             JSONObject r7 = communicationModule.get("/metrology");
             region.setTimestamp(r7.getBigDecimal("timestamp").intValue());
@@ -144,10 +148,12 @@ public class Game {
                     region.setWeatherTomorow(aWeather.getString("weather"));
                 }
             }
+            return true;
 
             
         } catch (IOException | JSONException e) {
             e.printStackTrace();
+            return false;
         }
     }
 
@@ -211,11 +217,24 @@ public class Game {
 
     }
 
-    public Boolean isNewDay(){
-        int day = region.getTimestamp() / 24;
-        if(day != savedDay){
-            savedDay = day;
+    public Boolean isNewHour(){
+        int hour = region.getTimestamp() % 24;
+        if(hour != savedHour){
+            savedHour = hour;
             return true;
+        }
+        return false;
+    }
+
+    public Boolean isSimilationTime(){
+        int heure = region.getTimestamp() % 24;
+        if(heure == 23 && !flagDay){
+            flagDay = true;
+            return true;
+        }
+        else if(heure != 23){
+            flagDay = false;
+            return false;
         }
         return false;
     }

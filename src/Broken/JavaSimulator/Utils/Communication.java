@@ -34,8 +34,8 @@ public class Communication {
         con.setRequestProperty("User-Agent", USER_AGENT);
 
         int responseCode = con.getResponseCode();
-        System.out.println("Sending get request : "+ url);
-        System.out.println("Response code : "+ responseCode);
+//        System.out.println("Sending get request : "+ url);
+//        System.out.println("Response code : "+ responseCode);
 
         // Reading response from input Stream
         BufferedReader in = new BufferedReader(
@@ -78,9 +78,9 @@ public class Communication {
         wr.close();
 
         int responseCode = con.getResponseCode();
-        System.out.println("nSending 'POST' request to URL : " + url);
-        System.out.println("Post Data : " + postJsonData);
-        System.out.println("Response Code : " + responseCode);
+//        System.out.println("nSending 'POST' request to URL : " + url);
+//        System.out.println("Post Data : " + postJsonData);
+//        System.out.println("Response Code : " + responseCode);
 
         BufferedReader in = new BufferedReader(
                 new InputStreamReader(con.getInputStream()));
@@ -93,7 +93,7 @@ public class Communication {
         in.close();
 
         //printing result from response
-        System.out.println(response.toString());
+//        System.out.println(response.toString());
         return false;
     }
 

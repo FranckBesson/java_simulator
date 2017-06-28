@@ -1,16 +1,18 @@
 package Broken.JavaSimulator.Utils;
 
+import Broken.JavaSimulator.GameUtils.Drink;
 import Broken.JavaSimulator.GameUtils.Item;
 import Broken.JavaSimulator.GameUtils.Player;
 import Broken.JavaSimulator.Utils.Exception.NoAdFound;
+import Broken.JavaSimulator.Utils.Exception.NoDrinkFound;
 import Broken.JavaSimulator.Utils.Exception.NoStandException;
 import Broken.JavaSimulator.Utils.Exception.PlayerNotFound;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;
-import sun.reflect.generics.tree.Tree;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 import java.util.ArrayList;
-import java.util.zip.Inflater;
 
 /**
  * Created by sebastien on 27/06/17.
@@ -41,15 +43,15 @@ public class TreeViewUtils {
         try {
 
             TreeItem<String> playerBranch = getPlayerBranch(root,playerInfo.getID());
-            System.out.println("Ok player");
+//            System.out.println("Ok player");
             getBranch(playerBranch,"Cash").setValue(String.valueOf(("Cash: " + playerInfo.getCash())));
-            System.out.println("Ok cash");
+//            System.out.println("Ok cash");
             getBranch(playerBranch,"Sales").setValue(String.valueOf(("Sales: " + playerInfo.getSales())));
-            System.out.println("Ok sales");
+//            System.out.println("Ok sales");
             getBranch(playerBranch,"Profit").setValue(String.valueOf(("Profit: " + playerInfo.getProfit())));
-            System.out.println("Ok profit");
+//            System.out.println("Ok profit");
             TreeItem<String> standsBranch = getBranch(playerBranch, "Stand");
-            System.out.println("Ok Stands");
+//            System.out.println("Ok Stands");
             try {
                 Item stands = playerInfo.getStand();
                 if(standsBranch.getChildren().size() == 0){
@@ -59,10 +61,10 @@ public class TreeViewUtils {
                 }
                 else
                 {
-                    try {
-                        getBranch(standsBranch,"Positon").setValue("Position: " + stands.getLocation().toString());
-                        getBranch(standsBranch,"Positon").setValue("Influence: " + stands.getInfluence());
-                    }catch (PlayerNotFound e){}
+
+                    getBranch(standsBranch,"Positon").setValue("Position: " + stands.getLocation().toString());
+                    getBranch(standsBranch,"Positon").setValue("Influence: " + stands.getInfluence());
+
 
                 }
             } catch (NoStandException e) {
@@ -70,7 +72,7 @@ public class TreeViewUtils {
             }
 
             TreeItem<String> adsBranch = getBranch(playerBranch, "Ads");
-            System.out.println("Ok ads");
+//            System.out.println("Ok ads");
             try {
                 ArrayList<Item> ads = playerInfo.getAds();
                 if(ads.size()!=adsBranch.getChildren().size()){
@@ -83,10 +85,9 @@ public class TreeViewUtils {
                 {
                     int i = 0;
                     for(TreeItem<String> unAds : adsBranch.getChildren()){
-                        try {
-                            getBranch(unAds,"Positon").setValue("Position: " + ads.get(i).getLocation().toString());
-                            getBranch(standsBranch,"Influence>").setValue("Influence: " + ads.get(i).getInfluence());
-                        }catch (PlayerNotFound e){}
+
+                        getBranch(unAds,"Positon").setValue("Position: " + ads.get(i).getLocation().toString());
+                        getBranch(standsBranch,"Influence>").setValue("Influence: " + ads.get(i).getInfluence());
 
                         i++;
                     }
@@ -95,14 +96,25 @@ public class TreeViewUtils {
             } catch (NoAdFound noAdFound) {
                 adsBranch.getChildren().clear();
             }
+            TreeItem<String> drinksBranch = getBranch(playerBranch, "Drinks");
+            try {
+                checkDrinks(playerInfo,drinksBranch);
+
+            } catch (NoDrinkFound noDrinkFound) {
+                noDrinkFound.printStackTrace();
+            }
+
 
         } catch (PlayerNotFound playerNotFound) {
-            System.out.println("Create new");
+//            System.out.println("Create new");
             TreeItem<String> playerBranch;
             try {
                 playerBranch= getBranch(root,playerInfo.getID());
             } catch (PlayerNotFound playerNotFound1) {
-                playerBranch = new TreeItem<>(playerInfo.getID());
+                ImageView playerIcon = new ImageView(new Image("Broken/JavaSimulator/resources/playerIcon.png"));
+                playerIcon.setPreserveRatio(true);
+                playerIcon.setSmooth(true);
+                playerBranch = new TreeItem<>(playerInfo.getID(),playerIcon);
                 root.getChildren().add(playerBranch);
                 TreeItem<String> cash = new TreeItem<>(("Cash: " + playerInfo.getCash()));
                 TreeItem<String> sales = new TreeItem<>(("Sales: " + playerInfo.getSales()));
@@ -125,7 +137,30 @@ public class TreeViewUtils {
                 } catch (NoAdFound noAdFound) {
                     ads.getChildren().clear();
                 }
-                playerBranch.getChildren().addAll(cash,sales,profit,stands,ads);
+                TreeItem<String> drinks = new TreeItem<>("Drinks");
+                try {
+                    ArrayList<Drink> drinksArray = playerInfo.getDrinks();
+                    for(Drink aDrink : drinksArray){
+                        addDrink(drinks,aDrink);
+                    }
+                } catch (NoDrinkFound noDrinkFound) {
+                    noDrinkFound.printStackTrace();
+                }
+                TreeItem<String> drinksOfferd = new TreeItem<>("Drinks Offered");
+                try {
+                    ArrayList<Drink> drinksArray = playerInfo.getDrinksOffered();
+                    for(Drink aDrink : drinksArray){
+                        addDrink(drinksOfferd,aDrink);
+                    }
+                } catch (NoDrinkFound noDrinkFound) {
+                    noDrinkFound.printStackTrace();
+                }
+
+
+
+
+                playerBranch.getChildren().addAll(cash,sales,profit,stands,ads,drinks,drinksOfferd);
+
             }
 
         }
@@ -141,17 +176,53 @@ public class TreeViewUtils {
         adsBranch.getChildren().add(ads);
     }
 
+
+
+    private static void addDrink(TreeItem<String> drinksBranch, Drink drink){
+        TreeItem<String> price = new TreeItem<>(("Price: "+String.valueOf(drink.getPrice())));
+        TreeItem<String> hasAlcool = new TreeItem<>(("Has Alcool: "+String.valueOf(drink.hasAlcohol())));
+        TreeItem<String> isCold = new TreeItem<>(("Is Cool: "+String.valueOf(drink.isCold())));
+        TreeItem<String> name = new TreeItem<>(drink.getName());
+        name.getChildren().addAll(price,hasAlcool,isCold);
+        drinksBranch.getChildren().add(name);
+    }
+
+    private static void checkDrinks(Player playerInfo, TreeItem<String> drinksBranch) throws NoDrinkFound, PlayerNotFound {
+        ArrayList<Drink> drinks = playerInfo.getDrinks();
+        if(drinks.size()!=drinksBranch.getChildren().size()){
+            drinksBranch.getChildren().clear();
+            for(Drink aDrink : drinks){
+                addDrink(drinksBranch,aDrink);
+            }
+        }
+        else
+        {
+            for(Drink aDrink : drinks){
+                TreeItem<String> thisDrink = getBranch(drinksBranch, aDrink.getName());
+
+                getBranch(thisDrink,"Price").setValue(("Price: "+String.valueOf(aDrink.getPrice())));
+                getBranch(thisDrink,"Has Alcool").setValue("Has Alcool: "+String.valueOf(aDrink.hasAlcohol()));
+                getBranch(thisDrink,"Is Cool").setValue(("Is Cool: "+String.valueOf(aDrink.isCold())));
+
+            }
+        }
+    }
+
     public static void checkAndDelExedent(TreeItem<String> root, ArrayList<Player> playerInfo){
         ObservableList<TreeItem<String>> playersBranch = root.getChildren();
         for(TreeItem<String> aBranch : playersBranch){
             boolean find = false;
             for(Player aPlayer : playerInfo){
-                if(aPlayer.getID().equals(aBranch.getValue()))
+//                System.out.println(aBranch.getValue()+" == "+aPlayer.getID()+" => "+aPlayer.getID().contains(aBranch.getValue()));
+                if(aPlayer.getID().contains(aBranch.getValue())){
                     find = true;
                     break;
+                }
+
             }
             if (!find){
-                playersBranch.removeAll(aBranch);
+                System.out.println("Delleting: "+aBranch.getValue());
+                playersBranch.remove(aBranch);
             }
         }
     }

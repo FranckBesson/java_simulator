@@ -1,6 +1,7 @@
 package Broken.JavaSimulator.GameUtils;
 
 import Broken.JavaSimulator.Utils.Exception.NoAdFound;
+import Broken.JavaSimulator.Utils.Exception.NoDrinkFound;
 import Broken.JavaSimulator.Utils.Exception.NoStandException;
 
 import java.util.ArrayList;
@@ -13,7 +14,7 @@ public class Player {
     private float cash;
     private int sales;
     private float profit;
-    private ArrayList<Drink> Drinks = new ArrayList<>();
+    private ArrayList<Drink> drinks = new ArrayList<>();
     private ArrayList<Item> items = new ArrayList<>();
     private ArrayList<Drink> drinksOffered = new ArrayList<>();
 
@@ -22,7 +23,7 @@ public class Player {
         this.cash = cash;
         this.sales = sales;
         this.profit = profit;
-        Drinks = drinks;
+        this.drinks = drinks;
         this.items = items;
         this.drinksOffered = drinksOffered;
     }
@@ -44,8 +45,16 @@ public class Player {
         return profit;
     }
 
-    public ArrayList<Drink> getDrinks() {
-        return Drinks;
+    public ArrayList<Drink> getDrinks() throws NoDrinkFound {
+        if(drinks.size()!= 0)
+            return drinks;
+        throw new NoDrinkFound();
+    }
+
+    public ArrayList<Drink> getDrinksOffered() throws NoDrinkFound {
+        if(drinksOffered.size()!= 0)
+            return drinksOffered;
+        throw new NoDrinkFound();
     }
 
     public ArrayList<Item> getItems() {

@@ -2,12 +2,10 @@ package Broken.JavaSimulator;
 
 import Broken.JavaSimulator.GameUtils.*;
 import Broken.JavaSimulator.Utils.ConvertPoss;
-import Broken.JavaSimulator.Utils.Exception.NoStandException;
-import Broken.JavaSimulator.Utils.Exception.PlayerNotFound;
-import Broken.JavaSimulator.Utils.Simulation;
 import Broken.JavaSimulator.Utils.TreeViewUtils;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Orientation;
@@ -21,7 +19,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
 //import java.awt.*;
-import javax.swing.plaf.synth.SynthTextAreaUI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
@@ -45,11 +42,11 @@ public class ControllerMainScreen implements Initializable{
     private float circleSize = 7;
 
     private Boolean first = true;
+    private String selectedPlayer = "null";
 
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
 
 
         double canvasWhith = (root.getPrefWidth()/5)*4;
@@ -86,6 +83,21 @@ public class ControllerMainScreen implements Initializable{
         TreeItem<String> rootPlayer = new TreeItem<>();
         treeView = new TreeView<String>(rootPlayer);
         treeView.setShowRoot(false);
+        treeView.setStyle("-fx-font-weight: bold");
+        treeView.getSelectionModel().getSelectedItems().addListener(new ListChangeListener<TreeItem<String>>() {
+            @Override
+            public void onChanged(Change<? extends TreeItem<String>> c) {
+                TreeItem<String> selectedItem = treeView.getSelectionModel().getSelectedItems().get(0);
+                selectedPlayer = "null";
+
+                for(Player aplayer : Main.game.getRegion().getPlayers()){
+                    if(aplayer.getID().equals(selectedItem.getValue())){
+                        selectedPlayer = aplayer.getID();
+                    }
+                }
+                updateCanvas();
+            }
+        });
 
         //Weather box
         VBox todayHbox = new VBox();
@@ -108,9 +120,6 @@ public class ControllerMainScreen implements Initializable{
         splitPane.getItems().addAll(map,rightSplitPane);
 
 
-
-
-
         upHBox.getChildren().addAll(timeVbox,dayVbox);
         upHBox.setStyle("-fx-font-size: 2em;-fx-font-weight: bold");
         splitPane2.getItems().addAll(upHBox,splitPane);
@@ -126,7 +135,7 @@ public class ControllerMainScreen implements Initializable{
     }
 
     public void updateScreenSize(){
-        System.out.println(root.getWidth());
+        //System.out.println(root.getWidth());
         double canvasWhith = (root.getWidth()/5)*4;
         double canvasHeight = (root.getHeight()/5)*4;
         map.setHeight(canvasHeight);
@@ -153,48 +162,6 @@ public class ControllerMainScreen implements Initializable{
             int timeCompt = region.getTimestamp() % 24;
             day.setText("" + dayCompt);
             time.setText("" + timeCompt + ":00");
-//            rootTree.getChildren().clear();
-//            for (Player aPlayer : region.getPlayers()) {
-//                TreeItem<String> playerItem = new TreeItem<>(aPlayer.getID());
-//                TreeItem<String> cash = new TreeItem<>("Cash: " + aPlayer.getCash());
-//                TreeItem<String> sales = new TreeItem<>("Sales: " + aPlayer.getSales());
-//                TreeItem<String> profit = new TreeItem<>("Profit: " + aPlayer.getProfit());
-//                TreeItem<String> stands = new TreeItem<>("Stand");
-//                TreeItem<String> ads = new TreeItem<>("Ads");
-//                int iStand = 1;
-//                int iAd = 1;
-//                for (Item aItem : aPlayer.getItems()) {
-//                    TreeItem<String> poss = new TreeItem<>("Position: " + aItem.getLocation().toString());
-//                    TreeItem<String> inf = new TreeItem<>("Influence: " + aItem.getInfluence());
-//
-//
-//                    if (aItem.getKind() == Item.KIND.AD) {
-//                        TreeItem<String> node = new TreeItem<>("" + iAd);
-//                        node.getChildren().addAll(poss, inf);
-//                        ads.getChildren().add(node);
-//                        iAd++;
-//                    } else {
-//                        TreeItem<String> node = new TreeItem<>("" + iStand);
-//                        node.getChildren().addAll(poss, inf);
-//                        stands.getChildren().add(node);
-//                        iStand++;
-//                    }
-//                }
-//                TreeItem<String> drinks = new TreeItem<>("Drinks");
-//                for (Drink aDrink : aPlayer.getDrinks()) {
-//                    TreeItem<String> price = new TreeItem<>("Price: " + aDrink.getPrice() + "€");
-//                    TreeItem<String> hasAlcohol = new TreeItem<>("Has Alcohol: " + aDrink.HasAlcohol());
-//                    TreeItem<String> isCold = new TreeItem<>("Is Cold: " + aDrink.isCold());
-//                    TreeItem<String> node = new TreeItem<>(aDrink.getName());
-//                    node.getChildren().addAll(price, hasAlcohol, isCold);
-//                    drinks.getChildren().add(node);
-//                }
-//
-//                playerItem.getChildren().addAll(cash, sales, profit, ads, stands);
-//                rootTree.getChildren().add(playerItem);
-//
-//
-//        }
         });
 
     }
@@ -207,23 +174,50 @@ public class ControllerMainScreen implements Initializable{
             GraphicsContext gc = map.getGraphicsContext2D();
             Coordinate canvasSize = new Coordinate( new Float(map.getWidth()),new Float(map.getHeight()));
             gc.clearRect(0, 0, map.getWidth(), map.getHeight());
-            gc.setFill(Color.BLUE);
             ArrayList<Player> players = Main.game.getRegion().getPlayers();
+
+
+            gc.setStroke(Color.BLACK);
             for(Player aPlayer : players) {
-                try {
-                    Item sand = aPlayer.getStand();
-                    Coordinate pos = ConvertPoss.doYouJob(regionSize, canvasSize, sand.getLocation());
-                    System.out.println("New Pos: " + pos.toString());
-                    gc.fillOval(pos.getLatitude(), pos.getLongitude(), circleSize, circleSize);
-                } catch (NoStandException e) {
-                    e.printStackTrace();
+                if(aPlayer.getID().equals(selectedPlayer))
+                    gc.setFill(Color.rgb(255,255,0,0.8));
+                else
+                    gc.setFill(Color.rgb(0,191,255,0.7));
+                ArrayList<Item> items = aPlayer.getItems();
+                for(Item unItem : items)
+                {
+                    Coordinate pos = ConvertPoss.doYouJob(regionSize, canvasSize, unItem.getLocation());
+                    Coordinate range = ConvertPoss.doYouJob(regionSize,canvasSize,new Coordinate(unItem.getInfluence(),unItem.getInfluence()));
+//                                              System.out.println("New Pos: " + pos.toString());
+                    gc.fillOval(pos.getLatitude()-(range.getLatitude()/2), pos.getLongitude()-(range.getLongitude()/2), range.getLatitude(), range.getLongitude());
+                    gc.strokeOval(pos.getLatitude()-(range.getLatitude()/2), pos.getLongitude()-(range.getLongitude()/2), range.getLatitude(), range.getLongitude());
                 }
+
             }
+
+
+            for(Player aPlayer : players) {
+
+                ArrayList<Item> items = aPlayer.getItems();
+                for(Item unItem : items)
+                {
+                    Coordinate pos = ConvertPoss.doYouJob(regionSize, canvasSize, unItem.getLocation());
+                    if(unItem.getKind() == Item.KIND.AD)
+                        gc.setFill(Color.TEAL);
+                    else
+                        gc.setFill(Color.BLUE);
+//                                              System.out.println("New Pos: " + pos.toString());
+                    gc.fillOval(pos.getLatitude()-(circleSize/2), pos.getLongitude()-(circleSize/2), circleSize, circleSize);
+
+                }
+
+            }
+
             gc.setFill(Color.RED);
             ArrayList<Bot> bots = Main.game.getRegion().getBots();
             for(Bot aBot : bots){
                 Coordinate pos = ConvertPoss.doYouJob(regionSize, canvasSize, aBot.getLocation());
-                System.out.println("New Pos: " + pos.toString());
+//                System.out.println("New Pos: " + pos.toString());
                 gc.fillOval(pos.getLatitude(), pos.getLongitude(), circleSize, circleSize);
             }
         });
@@ -243,6 +237,9 @@ public class ControllerMainScreen implements Initializable{
                 root.widthProperty().addListener(((observable, oldValue, newValue) -> {
                     updateScreenSize();
                 }));
+                root.heightProperty().addListener(((observable, oldValue, newValue) -> {
+                    updateScreenSize();
+                }));
                 UpdateScreen updateScreen = new UpdateScreen();
                 updateScreen.start();
 
@@ -256,17 +253,37 @@ public class ControllerMainScreen implements Initializable{
     private class UpdateScreen extends Thread{
         @Override
         public void run() {
+            Main.game.updateRegion();
             while(true)
             {
-                Main.game.updateTime();
-                Main.game.updateRegion();
-                if(Main.game.isNewDay()){
-                    Main.game.getSimulationModule().simulate(Main.game.getRegion());
+                while(!Main.game.updateTime()){
+                    System.err.println("Metrologie get fail !");
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                if(Main.game.isSimilationTime()){
+
+                    Main.game.formatAndSendSales(Main.game.getSimulationModule().simulate(Main.game.getRegion()));
+                }
+                if(Main.game.isNewHour()){
+
+                    while(!Main.game.updateRegion()){
+                        System.err.println("Map get fail !");
+                        try {
+                            Thread.sleep(500);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
                 }
                 updateCanvas();
                 update();
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(500);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

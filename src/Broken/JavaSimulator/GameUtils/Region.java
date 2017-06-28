@@ -10,6 +10,16 @@ import java.util.ArrayList;
 public class Region {
     private String weatherToday;
     private String weatherTomorow;
+    private String savedWeather = "";
+
+    public String getSavedWeather() {
+        return savedWeather;
+    }
+
+    public void setSavedWeather(String savedWeather) {
+        this.savedWeather = savedWeather;
+    }
+
     private int timestamp;
 
     private ArrayList<Bot> bots = new ArrayList<>();

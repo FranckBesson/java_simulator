@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.stage.Screen?>
 <StackPane xmlns:fx="http://javafx.com/fxml/1" fx:id="root" fx:controller="Broken.JavaSimulator.ControllerMainScreen"
            prefWidth="${screen.visualBounds.width}"
