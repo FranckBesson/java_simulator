@@ -4,7 +4,9 @@ import Broken.JavaSimulator.GameUtils.Coordinate;
 
 /**
  * Created by sebastien on 27/06/17.
+ * Used to convert condinate on Map to coordinate on Canvas
  */
+
 public class ConvertPoss {
     public static Coordinate doYouJob(Coordinate mapSize, Coordinate canvasSize, Coordinate toConvert){
         float latitudeRatio =canvasSize.getLatitude()/mapSize.getLatitude();

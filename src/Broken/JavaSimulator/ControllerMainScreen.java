@@ -79,7 +79,7 @@ public class ControllerMainScreen implements Initializable{
         dayVbox.getChildren().addAll(new Label("Day"),day);
 
 
-
+        //Treeview on right
         TreeItem<String> rootPlayer = new TreeItem<>();
         treeView = new TreeView<String>(rootPlayer);
         treeView.setShowRoot(false);
@@ -189,8 +189,8 @@ public class ControllerMainScreen implements Initializable{
                     Coordinate pos = ConvertPoss.doYouJob(regionSize, canvasSize, unItem.getLocation());
                     Coordinate range = ConvertPoss.doYouJob(regionSize,canvasSize,new Coordinate(unItem.getInfluence(),unItem.getInfluence()));
 //                                              System.out.println("New Pos: " + pos.toString());
-                    gc.fillOval(pos.getLatitude()-(range.getLatitude()/2), pos.getLongitude()-(range.getLongitude()/2), range.getLatitude(), range.getLongitude());
-                    gc.strokeOval(pos.getLatitude()-(range.getLatitude()/2), pos.getLongitude()-(range.getLongitude()/2), range.getLatitude(), range.getLongitude());
+                    gc.fillOval(pos.getLatitude()-range.getLatitude(), pos.getLongitude()-range.getLongitude(), range.getLatitude()*2, range.getLongitude()*2);
+                    gc.strokeOval(pos.getLatitude()-range.getLatitude(), pos.getLongitude()-range.getLongitude(), range.getLatitude()*2, range.getLongitude()*2);
                 }
 
             }
@@ -218,7 +218,7 @@ public class ControllerMainScreen implements Initializable{
             for(Bot aBot : bots){
                 Coordinate pos = ConvertPoss.doYouJob(regionSize, canvasSize, aBot.getLocation());
 //                System.out.println("New Pos: " + pos.toString());
-                gc.fillOval(pos.getLatitude(), pos.getLongitude(), circleSize, circleSize);
+                gc.fillOval(pos.getLatitude()-(circleSize/2), pos.getLongitude()-(circleSize/2), circleSize, circleSize);
             }
         });
 
@@ -227,7 +227,9 @@ public class ControllerMainScreen implements Initializable{
 
     }
 
-    //Thread wait for screen stabilisation
+    /**
+     * Whait for screen size stabilized
+     */
     private class StabWait extends Thread
     {
         @Override
@@ -249,7 +251,9 @@ public class ControllerMainScreen implements Initializable{
         }
     }
 
-
+    /**
+     * Ifinit loop for update screen, get all information form serv and launch simalation
+     */
     private class UpdateScreen extends Thread{
         @Override
         public void run() {

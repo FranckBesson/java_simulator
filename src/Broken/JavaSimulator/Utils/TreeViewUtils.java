@@ -16,8 +16,17 @@ import java.util.ArrayList;
 
 /**
  * Created by sebastien on 27/06/17.
+ * All utils for update a TreeView
  */
 public class TreeViewUtils {
+
+    /**
+     * Return the branch whit the player name
+     * @param root
+     * @param playerID
+     * @return
+     * @throws PlayerNotFound
+     */
     public static TreeItem<String> getPlayerBranch(TreeItem<String> root, String playerID) throws PlayerNotFound {
         ObservableList<TreeItem<String>> playersBranch = root.getChildren();
         for(TreeItem<String> aBranche : playersBranch){
@@ -28,6 +37,13 @@ public class TreeViewUtils {
         throw new PlayerNotFound();
     }
 
+    /**
+     * Return the branch who contain the string ID
+     * @param root
+     * @param ID
+     * @return
+     * @throws PlayerNotFound
+     */
     private static TreeItem<String> getBranch(TreeItem<String> root, String ID) throws PlayerNotFound {
         ObservableList<TreeItem<String>> playersBranch = root.getChildren();
         for(TreeItem<String> aBranche : playersBranch){
@@ -38,21 +54,27 @@ public class TreeViewUtils {
         throw new PlayerNotFound();
     }
 
+    /**
+     * Update all info of a player
+     * @param root
+     * @param playerInfo
+     */
     public static void updatePlayerBranche(TreeItem<String> root, Player playerInfo){
+
 
         try {
 
+            //Collect Player Branch -> if not found create new on catch
             TreeItem<String> playerBranch = getPlayerBranch(root,playerInfo.getID());
-//            System.out.println("Ok player");
+            //Collect and update all player infos
             getBranch(playerBranch,"Cash").setValue(String.valueOf(("Cash: " + playerInfo.getCash())));
-//            System.out.println("Ok cash");
             getBranch(playerBranch,"Sales").setValue(String.valueOf(("Sales: " + playerInfo.getSales())));
-//            System.out.println("Ok sales");
             getBranch(playerBranch,"Profit").setValue(String.valueOf(("Profit: " + playerInfo.getProfit())));
-//            System.out.println("Ok profit");
+
+            //Collect all stand and update is info
             TreeItem<String> standsBranch = getBranch(playerBranch, "Stand");
-//            System.out.println("Ok Stands");
             try {
+                //If no ads, clear all
                 Item stands = playerInfo.getStand();
                 if(standsBranch.getChildren().size() == 0){
                     TreeItem<String> poss = new TreeItem<>("Position: " + stands.getLocation().toString());
@@ -71,8 +93,8 @@ public class TreeViewUtils {
                 standsBranch.getChildren().clear();
             }
 
+            //Collect and update ads...
             TreeItem<String> adsBranch = getBranch(playerBranch, "Ads");
-//            System.out.println("Ok ads");
             try {
                 ArrayList<Item> ads = playerInfo.getAds();
                 if(ads.size()!=adsBranch.getChildren().size()){
@@ -96,6 +118,8 @@ public class TreeViewUtils {
             } catch (NoAdFound noAdFound) {
                 adsBranch.getChildren().clear();
             }
+
+            //Collect and update Drincks...
             TreeItem<String> drinksBranch = getBranch(playerBranch, "Drinks");
             try {
                 checkDrinks(playerInfo,drinksBranch);
@@ -106,11 +130,13 @@ public class TreeViewUtils {
 
 
         } catch (PlayerNotFound playerNotFound) {
-//            System.out.println("Create new");
+
             TreeItem<String> playerBranch;
             try {
-                playerBranch= getBranch(root,playerInfo.getID());
+                //Check if the player branch exist, if exist, skip creation...
+                getBranch(root,playerInfo.getID());
             } catch (PlayerNotFound playerNotFound1) {
+                //Create Player
                 ImageView playerIcon = new ImageView(new Image("Broken/JavaSimulator/resources/playerIcon.png"));
                 playerIcon.setPreserveRatio(true);
                 playerIcon.setSmooth(true);
@@ -167,6 +193,11 @@ public class TreeViewUtils {
 
     }
 
+    /**
+     * Add ad on branch
+     * @param adsBranch
+     * @param ad
+     */
     private static void addAd(TreeItem<String> adsBranch, Item ad){
         int size = adsBranch.getChildren().size();
         TreeItem<String> poss = new TreeItem<>("Position: " + ad.getLocation().toString());
@@ -177,7 +208,11 @@ public class TreeViewUtils {
     }
 
 
-
+    /**
+     * Add drinj in branch
+     * @param drinksBranch
+     * @param drink
+     */
     private static void addDrink(TreeItem<String> drinksBranch, Drink drink){
         TreeItem<String> price = new TreeItem<>(("Price: "+String.valueOf(drink.getPrice())));
         TreeItem<String> hasAlcool = new TreeItem<>(("Has Alcool: "+String.valueOf(drink.hasAlcohol())));
@@ -187,6 +222,13 @@ public class TreeViewUtils {
         drinksBranch.getChildren().add(name);
     }
 
+    /**
+     * Check drink branche size, if different update it
+     * @param playerInfo
+     * @param drinksBranch
+     * @throws NoDrinkFound
+     * @throws PlayerNotFound
+     */
     private static void checkDrinks(Player playerInfo, TreeItem<String> drinksBranch) throws NoDrinkFound, PlayerNotFound {
         ArrayList<Drink> drinks = playerInfo.getDrinks();
         if(drinks.size()!=drinksBranch.getChildren().size()){
@@ -208,6 +250,11 @@ public class TreeViewUtils {
         }
     }
 
+    /**
+     * Check if nbr of player branch is different of player list (del exedent)
+     * @param root
+     * @param playerInfo
+     */
     public static void checkAndDelExedent(TreeItem<String> root, ArrayList<Player> playerInfo){
         ObservableList<TreeItem<String>> playersBranch = root.getChildren();
         for(TreeItem<String> aBranch : playersBranch){

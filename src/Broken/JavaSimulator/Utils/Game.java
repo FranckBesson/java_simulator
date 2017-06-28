@@ -13,6 +13,8 @@ import java.util.ArrayList;
 
 /**
  * Created by sebastien on 21/06/17.
+ * Contains all games utils
+ *
  */
 public class Game {
     private Communication communicationModule;
@@ -32,6 +34,10 @@ public class Game {
 
     }
 
+    /**
+     * Send R2 request and update all
+     * @return
+     */
     public boolean updateRegion()
     {
         try {
@@ -55,7 +61,7 @@ public class Game {
                 JSONObject curentPlayerInfo = null;
 
                 try{
-
+                    //Get object contain all player infos
                     curentPlayerInfo = jsonPlayerInfo.getJSONObject(curentID);
                     curentCash = curentPlayerInfo.getBigDecimal("cash").floatValue();
                     //System.out.println("Cash: " +curentCash);
@@ -67,6 +73,7 @@ public class Game {
                     e.printStackTrace();
                 }
 
+                //colect all items of this player
                 ArrayList<Item> curentItems = new ArrayList<>();
                 try {
                     JSONArray curentJsonItems = jsonItems.getJSONArray(curentID);
@@ -74,11 +81,11 @@ public class Game {
                 }catch (JSONException e){
                     System.err.println(e.getMessage());
                 }
-
+                //colect all drinks in drinks offered of this player
                 ArrayList<Drink> drinksOffered = new ArrayList<>();
                 if(curentPlayerInfo != null)
                     drinksOffered = this.getDrinks(curentPlayerInfo.getJSONArray("drinksOffered"));
-
+                //colect all drinks in drinks of this player
                 ArrayList<Drink> curentDrinks = new ArrayList<>();
                 try{
                     JSONArray curentJsonPlayerDrinks = jsonDrink.getJSONArray(curentID);
@@ -94,6 +101,7 @@ public class Game {
 
             }
 
+            //Collect region infos
             Coordinate regionCenter = new Coordinate(regionJson.getJSONObject("center").getBigDecimal("latitude").floatValue(),regionJson.getJSONObject("center").getBigDecimal("longitude").floatValue());
             Coordinate regionSpan = new Coordinate(regionJson.getJSONObject("span").getBigDecimal("latitudeSpan").floatValue(),regionJson.getJSONObject("span").getBigDecimal("longitudeSpan").floatValue());
             if(region == null)
@@ -132,6 +140,10 @@ public class Game {
 
     }
 
+    /**
+     * Send R7 and update all (metrology)
+     * @return if resquest was works
+     */
     public boolean updateTime(){
         try {
             JSONObject r7 = communicationModule.get("/metrology");
@@ -158,27 +170,11 @@ public class Game {
     }
 
 
-
-    public void sendToServer(ArrayList<Sale> sales)
-    {
-        JSONObject main = new JSONObject();
-        JSONArray temp = new JSONArray();
-        for(Sale aSlae : sales)
-        {
-            JSONObject curentSale = new JSONObject();
-            curentSale.put("player",aSlae.getPlayer());
-            curentSale.put("item",aSlae.getItem());
-            curentSale.put("quatity",aSlae.getQuantity());
-            temp.put(curentSale);
-        }
-        main.put("sales",temp);
-        try {
-            communicationModule.post("/sales",main);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
+    /**
+     * return all items contains in a JSONArray
+     * @param arrayItems
+     * @return ArrayList of Item
+     */
     private ArrayList<Item> getItems(JSONArray arrayItems)
     {
         ArrayList<Item> tempImtems = new ArrayList<>();
@@ -196,6 +192,27 @@ public class Game {
         return tempImtems;
     }
 
+    /**
+     * return all drink contains in a JSON Array
+     * @param arrayDrinks
+     * @return
+     */
+    private ArrayList<Drink> getDrinks(JSONArray arrayDrinks)
+    {
+        ArrayList<Drink> tempDrinks = new ArrayList<>();
+        for (int j = 0; j<arrayDrinks.length(); j++)
+        {
+            JSONObject curentJsonDrink = arrayDrinks.getJSONObject(0);
+            Drink curentDrink = new Drink(curentJsonDrink.getString("name"),curentJsonDrink.getBigDecimal("price").floatValue(),curentJsonDrink.getBoolean("hasAlcohol"),curentJsonDrink.getBoolean("isCold"));
+            //System.out.println("\t"+curentDrink.toString());
+            tempDrinks.add(curentDrink);
+        }
+        return tempDrinks;
+    }
+    /**
+     * Format sales into JSON and send it to server
+     * @param sales
+     */
     public void formatAndSendSales(ArrayList<Sale> sales){
         JSONArray salesArray  = new JSONArray();
         for(Sale aSale : sales){
@@ -217,6 +234,10 @@ public class Game {
 
     }
 
+    /**
+     * Check if is a nex Hour
+     * @return
+     */
     public Boolean isNewHour(){
         int hour = region.getTimestamp() % 24;
         if(hour != savedHour){
@@ -226,6 +247,10 @@ public class Game {
         return false;
     }
 
+    /**
+     * Check if is 23h (for launch simulation)
+     * @return
+     */
     public Boolean isSimilationTime(){
         int heure = region.getTimestamp() % 24;
         if(heure == 23 && !flagDay){
@@ -240,18 +265,9 @@ public class Game {
     }
 
 
-    private ArrayList<Drink> getDrinks(JSONArray arrayDrinks)
-    {
-        ArrayList<Drink> tempDrinks = new ArrayList<>();
-        for (int j = 0; j<arrayDrinks.length(); j++)
-        {
-            JSONObject curentJsonDrink = arrayDrinks.getJSONObject(0);
-            Drink curentDrink = new Drink(curentJsonDrink.getString("name"),curentJsonDrink.getBigDecimal("price").floatValue(),curentJsonDrink.getBoolean("hasAlcohol"),curentJsonDrink.getBoolean("isCold"));
-            //System.out.println("\t"+curentDrink.toString());
-            tempDrinks.add(curentDrink);
-        }
-        return tempDrinks;
-    }
+    /*---------------------------------------------------------------------------
+        Geters
+     ----------------------------------------------------------------------------*/
 
     public Region getRegion() {
         return region;

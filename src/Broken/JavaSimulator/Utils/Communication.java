@@ -23,7 +23,13 @@ public class Communication {
         this.serveurAddres = serveurAddres;
     }
 
-
+    /**
+     * Send a get
+     * @param path
+     * @return
+     * @throws IOException
+     * @throws JSONException
+     */
     public JSONObject get(String path) throws IOException,JSONException {
         String urlString = serveurAddres+path;
 
@@ -57,7 +63,13 @@ public class Communication {
     }
 
 
-
+    /**
+     * Send a JSONObject on post request
+     * @param path
+     * @param toSend
+     * @return
+     * @throws IOException
+     */
     public boolean post(String path, JSONObject toSend) throws IOException {
         String url = serveurAddres+path;
         URL obj = new URL(url);
