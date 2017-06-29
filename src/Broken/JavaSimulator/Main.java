@@ -28,6 +28,8 @@ public class Main extends Application {
     }
 
 
+
+
     public static void main(String[] args) throws IOException {
 //        Game game = new Game("http://localhost:5000");
         game.updateRegion();

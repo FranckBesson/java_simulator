@@ -18,7 +18,7 @@ public class Simulation {
     private HashMap<String,Double> weatherProb = new HashMap<>();
     //Movement Prob
     private HashMap<String,Double> moveWeatherProb = new HashMap<>();
-    private static int NBR_BOT = 10;
+    private static int NBR_BOT = 500;
 
     /**
      * Constructor
@@ -29,12 +29,22 @@ public class Simulation {
         weatherProb.put("CLOUDY",0.3);
         weatherProb.put("SUNNY",0.75);
         weatherProb.put("HEATWAVE",1.0);
+//        weatherProb.put("THUNDERSTORM",1.0);
+//        weatherProb.put("RAINY",1.0);
+//        weatherProb.put("CLOUDY",1.0);
+//        weatherProb.put("SUNNY",1.0);
+//        weatherProb.put("HEATWAVE",1.0);
 
         moveWeatherProb.put("THUNDERSTORM",0.0);
         moveWeatherProb.put("RAINY",0.10);
         moveWeatherProb.put("CLOUDY",0.4);
         moveWeatherProb.put("SUNNY",0.5);
         moveWeatherProb.put("HEATWAVE",0.2);
+//        moveWeatherProb.put("THUNDERSTORM",1.0);
+//        moveWeatherProb.put("RAINY",1.0);
+//        moveWeatherProb.put("CLOUDY",1.0);
+//        moveWeatherProb.put("SUNNY",1.0);
+//        moveWeatherProb.put("HEATWAVE",1.0);
     }
 
 
@@ -81,7 +91,7 @@ public class Simulation {
     public boolean isOnRange(Bot bot, Item item){
         double lat = Math.pow(bot.getLocation().getLatitude()-item.getLocation().getLatitude(),2);
         double longi = Math.pow(bot.getLocation().getLongitude() - item.getLocation().getLongitude(),2);
-        System.out.println("On rage: bot: "+bot.getLocation()+" item: "+item.getLocation()+" decalage lat:" +lat+" long: "+longi+" "+((lat + longi) < Math.pow(item.getInfluence(),2)));
+        //System.out.println("On rage: bot: "+bot.getLocation()+" item: "+item.getLocation()+" decalage lat:" +lat+" long: "+longi+" "+((lat + longi) < Math.pow(item.getInfluence(),2)));
         return (lat + longi) < Math.pow(item.getInfluence(),2);
 
     }
@@ -147,6 +157,7 @@ public class Simulation {
                 Player savedPlayer = value.get(0);
                 for(Player aPlayer : value){
                     try {
+
                         if(aPlayer.getDrinks().get(0).getPrice() < savedPlayer.getDrinks().get(0).getPrice()){
                             savedPlayer = aPlayer;
                         }
@@ -174,7 +185,7 @@ public class Simulation {
         for(Map.Entry<Player, Integer> entry : botDispatch.entrySet()) {
             Player key = entry.getKey();
             Integer value = entry.getValue();
-            System.out.println("After area: "+key.getID()+" : "+value);
+            System.out.println("[sim]After area: "+key.getID()+" : "+value);
         }
 
         //list of all bot which are not un in any range
@@ -195,7 +206,7 @@ public class Simulation {
                 } catch (NoStandException e) {
                 }
             }
-            if(Math.random()> weatherProb.get(region.getWeatherToday())){
+            if(Math.random()<= weatherProb.get(region.getWeatherToday())){
                 if (botDispatch.containsKey(savedPlayers))
                     botDispatch.replace(savedPlayers, botDispatch.get(savedPlayers) + 1);
                 else
@@ -212,14 +223,23 @@ public class Simulation {
         for(Map.Entry<Player, Integer> entry : botDispatch.entrySet()) {
             Player key = entry.getKey();
             Integer value = entry.getValue();
-            System.out.println("Before Prob -> "+key.getID()+" : "+value);
+            System.out.println("[sim]Before Prob -> "+key.getID()+" : "+value);
+            System.out.println("[sim]Today Prob: "+todayProb);
+            try {
+                System.out.println("[sim]Drinks offered for "+key.getID()+" -> "+key.getDrinksOffered().size());
+            } catch (NoDrinkFound noDrinkFound) {
+                System.err.println("[sim]No Drinks Offer for "+key.getID());
+            }
 
             for(int i = 0; i<value; i++){
-                if(Math.random()>todayProb){
+                //System.out.println("Ok For");
+
+                if(Math.random()<=todayProb){
+                    System.out.println("[sim]Ok Probe");
                     if(!sales.containsKey(key.getID())){
                         try {
                             sales.put(key.getID(),new Sale(key.getID(),key.getDrinksOffered().get(0).getName(),1));
-                        } catch (NoDrinkFound noDrinkFound) {}
+                        } catch (NoDrinkFound noDrinkFound) {System.err.println("[sim]No Drinks Offer for "+key.getID());}
                     }
                     else
                         sales.get(key.getID()).increment();
@@ -227,9 +247,9 @@ public class Simulation {
                 }
             }
             if(sales.containsKey(key.getID()))
-                System.out.println("After prob: "+sales.get(key.getID()).getPlayer()+" : "+sales.get(key.getID()).getQuantity());
+                System.out.println("[sim]After prob: "+sales.get(key.getID()).getPlayer()+" : "+sales.get(key.getID()).getQuantity());
             else
-                System.out.println("After prob: "+key.getID()+" : 0");
+                System.out.println("[sim]After prob: "+key.getID()+" : 0");
 
         }
         //Convert hashmap into ArrayList

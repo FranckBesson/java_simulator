@@ -50,7 +50,7 @@ public class Game {
             JSONObject jsonItems = mapJson.getJSONObject("itemsByPlayer");
             JSONObject jsonDrink = mapJson.getJSONObject("drinksByPlayer");
             JSONObject regionJson = mapJson.getJSONObject("region");
-            region.players.clear();
+            players.clear();
             for(int i = 0 ; i<jsonPlayers.length(); i++) {
                 //get the curent player ID/name
                 String curentID =jsonPlayers.getString(i);
@@ -85,6 +85,12 @@ public class Game {
                 ArrayList<Drink> drinksOffered = new ArrayList<>();
                 if(curentPlayerInfo != null)
                     drinksOffered = this.getDrinks(curentPlayerInfo.getJSONArray("drinksOffered"));
+                if(drinksOffered.size() == 0){
+                    //System.out.println("0 Drinks offered for "+curentID);
+                }
+                for(Drink aDrink : drinksOffered){
+                    System.out.println("[game][update]Drinks offered "+curentID+": "+aDrink.getName());
+                }
                 //colect all drinks in drinks of this player
                 ArrayList<Drink> curentDrinks = new ArrayList<>();
                 try{
@@ -96,7 +102,7 @@ public class Game {
                 }
 
 
-                region.players.add(new Player(curentID,curentCash,curentSales,curentProfit,curentDrinks,curentItems,drinksOffered));
+                players.add(new Player(curentID,curentCash,curentSales,curentProfit,curentDrinks,curentItems,drinksOffered));
 
 
             }
@@ -224,6 +230,7 @@ public class Game {
         }
         JSONObject salesMain = new JSONObject();
         salesMain.put("sales",salesArray);
+        System.out.println("[sendGame]"+salesMain.toString());
 
         try {
             communicationModule.post("/sales",salesMain);
@@ -253,11 +260,11 @@ public class Game {
      */
     public Boolean isSimilationTime(){
         int heure = region.getTimestamp() % 24;
-        if(heure == 23 && !flagDay){
+        if(heure == 22 && !flagDay){
             flagDay = true;
             return true;
         }
-        else if(heure != 23){
+        else if(heure != 22){
             flagDay = false;
             return false;
         }

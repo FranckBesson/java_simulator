@@ -52,6 +52,7 @@ public class Player {
     }
 
     public ArrayList<Drink> getDrinksOffered() throws NoDrinkFound {
+        //System.out.println("[Player]Drink inf "+getID()+" -> "+drinksOffered.size());
         if(drinksOffered.size()!= 0)
             return drinksOffered;
         throw new NoDrinkFound();

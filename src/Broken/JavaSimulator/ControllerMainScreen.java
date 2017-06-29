@@ -270,7 +270,6 @@ public class ControllerMainScreen implements Initializable{
                 }
 
                 if(Main.game.isSimilationTime()){
-
                     Main.game.formatAndSendSales(Main.game.getSimulationModule().simulate(Main.game.getRegion()));
                 }
                 if(Main.game.isNewHour()){
@@ -283,14 +282,17 @@ public class ControllerMainScreen implements Initializable{
                             e.printStackTrace();
                         }
                     }
+                }else
+                {
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
                 updateCanvas();
                 update();
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+
             }
         }
     }

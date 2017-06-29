@@ -179,7 +179,7 @@ public class TreeViewUtils {
                         addDrink(drinksOfferd,aDrink);
                     }
                 } catch (NoDrinkFound noDrinkFound) {
-                    noDrinkFound.printStackTrace();
+                    //noDrinkFound.printStackTrace();
                 }
 
 
@@ -223,7 +223,7 @@ public class TreeViewUtils {
     }
 
     /**
-     * Check drink branche size, if different update it
+     * Check drink branch size, if different update it
      * @param playerInfo
      * @param drinksBranch
      * @throws NoDrinkFound
