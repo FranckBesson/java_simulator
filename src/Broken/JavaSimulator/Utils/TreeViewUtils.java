@@ -66,6 +66,7 @@ public class TreeViewUtils {
 
             //Collect Player Branch -> if not found create new on catch
             TreeItem<String> playerBranch = getPlayerBranch(root,playerInfo.getID());
+
             //Collect and update all player infos
             getBranch(playerBranch,"Cash").setValue(String.valueOf(("Cash: " + playerInfo.getCash())));
             getBranch(playerBranch,"Sales").setValue(String.valueOf(("Sales: " + playerInfo.getSales())));
@@ -74,7 +75,6 @@ public class TreeViewUtils {
 
             //Collect all stand and update is info
             TreeItem<String> standsBranch = getBranch(playerBranch, "Stand");
-            //TODO ICI CA MARCHE PUTAIN 
             try {
                 //If no ads, clear all
                 Item stands = playerInfo.getStand();
@@ -86,19 +86,23 @@ public class TreeViewUtils {
                 else
                 {
 
-                    getBranch(standsBranch,"Positon").setValue("Position: " + stands.getLocation().toString());
-                    getBranch(standsBranch,"Positon").setValue("Influence: " + stands.getInfluence());
+                    getBranch(standsBranch,"Position").setValue("Position: " + stands.getLocation().toString());
+                    getBranch(standsBranch,"Influence").setValue("Influence: " + stands.getInfluence());
 
 
                 }
-            } catch (NoStandException e) {
+            } catch (NoStandException  e) {
                 standsBranch.getChildren().clear();
-            }
+            }catch (PlayerNotFound ignore){}
 
             //Collect and update ads...
+
             TreeItem<String> adsBranch = getBranch(playerBranch, "Ads");
-            //TODO MAIS ICI NON PUTAIN
+
             try {
+
+
+
                 ArrayList<Item> ads = playerInfo.getAds();
                 if(ads.size()!=adsBranch.getChildren().size()){
                     adsBranch.getChildren().clear();
@@ -111,8 +115,8 @@ public class TreeViewUtils {
                     int i = 0;
                     for(TreeItem<String> unAds : adsBranch.getChildren()){
 
-                        getBranch(unAds,"Positon").setValue("Position: " + ads.get(i).getLocation().toString());
-                        getBranch(standsBranch,"Influence>").setValue("Influence: " + ads.get(i).getInfluence());
+                        getBranch(unAds,"Position").setValue("Position: " + ads.get(i).getLocation().toString());
+                        getBranch(standsBranch,"Influence").setValue("Influence: " + ads.get(i).getInfluence());
 
                         i++;
                     }
@@ -122,32 +126,37 @@ public class TreeViewUtils {
                 adsBranch.getChildren().clear();
             }
 
+
             //Collect and update Drincks...
+
             TreeItem<String> drinksBranch = getBranch(playerBranch, "Drinks");
+
+
             try {
                 checkDrinks(playerInfo,drinksBranch,false);
 
-            } catch (NoDrinkFound noDrinkFound) {
-                noDrinkFound.printStackTrace();
-            }
+            } catch (NoDrinkFound ignore) {}
+
             //Collect and update Drincks...
             TreeItem<String> drinksOfferedBranch = getBranch(playerBranch, "Drinks Offered");
+
+
             try {
                 checkDrinks(playerInfo,drinksOfferedBranch,true);
 
-            } catch (NoDrinkFound noDrinkFound) {
-                noDrinkFound.printStackTrace();
-            }
+            } catch (NoDrinkFound ignore) {drinksOfferedBranch.getChildren().clear();}
+
 
 
         } catch (PlayerNotFound playerNotFound) {
 
-            System.out.println("[treeUtil]Notfound");
+            System.out.println("[treeUtil]Notfound "+playerInfo.getID());
             TreeItem<String> playerBranch;
             try {
                 //Check if the player branch exist, if exist, skip creation...
-                getBranch(root,playerInfo.getID());
+                getPlayerBranch(root,playerInfo.getID());
             } catch (PlayerNotFound playerNotFound1) {
+                System.out.println("[treeUtil]Create "+playerInfo.getID()+" branche");
                 //Create Player
                 ImageView playerIcon = new ImageView(new Image("Broken/JavaSimulator/resources/playerIcon.png"));
                 playerIcon.setPreserveRatio(true);

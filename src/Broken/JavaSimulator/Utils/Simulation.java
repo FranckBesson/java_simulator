@@ -19,6 +19,8 @@ public class Simulation {
     //Movement Prob
     private HashMap<String,Double> moveWeatherProb = new HashMap<>();
     private static int NBR_BOT = 500;
+    private static float BASE_PRICE = 2.0f;
+    private static float DIVIDER = 20f;
 
     /**
      * Constructor
@@ -53,7 +55,7 @@ public class Simulation {
      * @param nbrOfBot
      * @param region
      */
-    private void placeBot(int nbrOfBot, Region region){
+    public void placeBot(int nbrOfBot, Region region){
 
         region.getBots().clear();
         for(int i = 0; i<nbrOfBot; i++)
@@ -224,7 +226,7 @@ public class Simulation {
             Player key = entry.getKey();
             Integer value = entry.getValue();
             System.out.println("[sim]Before Prob -> "+key.getID()+" : "+value);
-            System.out.println("[sim]Today Prob: "+todayProb);
+
             try {
                 System.out.println("[sim]Drinks offered for "+key.getID()+" -> "+key.getDrinksOffered().size());
             } catch (NoDrinkFound noDrinkFound) {
@@ -232,13 +234,16 @@ public class Simulation {
             }
 
             try {
+
                 Drink drink = key.getDrinksOffered().get(0);
-                float malus = drink.getPrice()/20;
-                System.out.println("[sim]Prob-malus: "+(todayProb-malus));
+                System.out.println("[sim]Base Prob: "+todayProb);
+                double finalProb = calculProb(todayProb, drink.getPrice());
+                System.out.println("[sim]Prob whit modification: "+finalProb);
+
                 for(int i = 0; i<value; i++) {
                     //System.out.println("Ok For");
 
-                    if (Math.random() <= todayProb) {
+                    if (Math.random() <= finalProb) {
                         //System.out.println("[sim]Ok Probe");
                         if (!sales.containsKey(key.getID())) {
                             sales.put(key.getID(), new Sale(key.getID(), drink.getName(), 1));
@@ -262,6 +267,19 @@ public class Simulation {
         ArrayList<Sale> salesArry = new ArrayList<>();
         salesArry.addAll(sales.values());
         return salesArry;
+    }
+
+    /**
+     * Calcul new sale prob in fonction of BASE_PRICE and sale price
+     * @param todayProb
+     * @param salePrice
+     * @return
+     */
+    private double calculProb(double todayProb,float salePrice){
+        float dif = BASE_PRICE - salePrice;
+        return todayProb+(dif/DIVIDER);
+
+
     }
 
 
