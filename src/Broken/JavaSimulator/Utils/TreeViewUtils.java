@@ -69,10 +69,12 @@ public class TreeViewUtils {
             //Collect and update all player infos
             getBranch(playerBranch,"Cash").setValue(String.valueOf(("Cash: " + playerInfo.getCash())));
             getBranch(playerBranch,"Sales").setValue(String.valueOf(("Sales: " + playerInfo.getSales())));
+
             getBranch(playerBranch,"Profit").setValue(String.valueOf(("Profit: " + playerInfo.getProfit())));
 
             //Collect all stand and update is info
             TreeItem<String> standsBranch = getBranch(playerBranch, "Stand");
+            //TODO ICI CA MARCHE PUTAIN 
             try {
                 //If no ads, clear all
                 Item stands = playerInfo.getStand();
@@ -95,6 +97,7 @@ public class TreeViewUtils {
 
             //Collect and update ads...
             TreeItem<String> adsBranch = getBranch(playerBranch, "Ads");
+            //TODO MAIS ICI NON PUTAIN
             try {
                 ArrayList<Item> ads = playerInfo.getAds();
                 if(ads.size()!=adsBranch.getChildren().size()){
@@ -122,7 +125,15 @@ public class TreeViewUtils {
             //Collect and update Drincks...
             TreeItem<String> drinksBranch = getBranch(playerBranch, "Drinks");
             try {
-                checkDrinks(playerInfo,drinksBranch);
+                checkDrinks(playerInfo,drinksBranch,false);
+
+            } catch (NoDrinkFound noDrinkFound) {
+                noDrinkFound.printStackTrace();
+            }
+            //Collect and update Drincks...
+            TreeItem<String> drinksOfferedBranch = getBranch(playerBranch, "Drinks Offered");
+            try {
+                checkDrinks(playerInfo,drinksOfferedBranch,true);
 
             } catch (NoDrinkFound noDrinkFound) {
                 noDrinkFound.printStackTrace();
@@ -131,6 +142,7 @@ public class TreeViewUtils {
 
         } catch (PlayerNotFound playerNotFound) {
 
+            System.out.println("[treeUtil]Notfound");
             TreeItem<String> playerBranch;
             try {
                 //Check if the player branch exist, if exist, skip creation...
@@ -229,8 +241,12 @@ public class TreeViewUtils {
      * @throws NoDrinkFound
      * @throws PlayerNotFound
      */
-    private static void checkDrinks(Player playerInfo, TreeItem<String> drinksBranch) throws NoDrinkFound, PlayerNotFound {
-        ArrayList<Drink> drinks = playerInfo.getDrinks();
+    private static void checkDrinks(Player playerInfo, TreeItem<String> drinksBranch,boolean offered) throws NoDrinkFound, PlayerNotFound {
+        ArrayList<Drink> drinks;
+        if(offered)
+            drinks = playerInfo.getDrinksOffered();
+        else
+            drinks = playerInfo.getDrinks();
         if(drinks.size()!=drinksBranch.getChildren().size()){
             drinksBranch.getChildren().clear();
             for(Drink aDrink : drinks){
@@ -240,11 +256,16 @@ public class TreeViewUtils {
         else
         {
             for(Drink aDrink : drinks){
-                TreeItem<String> thisDrink = getBranch(drinksBranch, aDrink.getName());
+                try{
+                    TreeItem<String> thisDrink = getBranch(drinksBranch, aDrink.getName());
 
-                getBranch(thisDrink,"Price").setValue(("Price: "+String.valueOf(aDrink.getPrice())));
-                getBranch(thisDrink,"Has Alcool").setValue("Has Alcool: "+String.valueOf(aDrink.hasAlcohol()));
-                getBranch(thisDrink,"Is Cool").setValue(("Is Cool: "+String.valueOf(aDrink.isCold())));
+                    getBranch(thisDrink,"Price").setValue(("Price: "+String.valueOf(aDrink.getPrice())));
+                    getBranch(thisDrink,"Has Alcool").setValue("Has Alcool: "+String.valueOf(aDrink.hasAlcohol()));
+                    getBranch(thisDrink,"Is Cool").setValue(("Is Cool: "+String.valueOf(aDrink.isCold())));
+                }catch (PlayerNotFound e) {
+                    System.out.println("[TreeUtils][checkD] " + aDrink.getName() + " not found");
+                }
+
 
             }
         }

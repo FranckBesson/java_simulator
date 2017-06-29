@@ -4,21 +4,29 @@ import Broken.JavaSimulator.GameUtils.*;
 import Broken.JavaSimulator.Utils.ConvertPoss;
 import Broken.JavaSimulator.Utils.TreeViewUtils;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.stage.Stage;
 
 //import java.awt.*;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
@@ -70,13 +78,31 @@ public class ControllerMainScreen implements Initializable{
         rightSplitPane = new SplitPane();
         rightSplitPane.setOrientation(Orientation.VERTICAL);
 
-
         timeVbox = new VBox();
         timeVbox.setAlignment(Pos.CENTER);
         timeVbox.getChildren().addAll(new Label("Time"),time);
         dayVbox = new VBox();
         dayVbox.setAlignment(Pos.CENTER);
         dayVbox.getChildren().addAll(new Label("Day"),day);
+        Button ranking = new Button("Ranking");
+        ranking.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                Parent root;
+                try {
+                    root = FXMLLoader.load(getClass().getClassLoader().getResource("Broken/JavaSimulator/resources/ranking.fxml"));
+                    Stage stage = new Stage();
+                    stage.setTitle("My New Stage Title");
+                    stage.setScene(new Scene(root, 300, 500));
+                    stage.setResizable(false);
+                    stage.show();
+                }
+                catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
 
 
         //Treeview on right
@@ -120,7 +146,7 @@ public class ControllerMainScreen implements Initializable{
         splitPane.getItems().addAll(map,rightSplitPane);
 
 
-        upHBox.getChildren().addAll(timeVbox,dayVbox);
+        upHBox.getChildren().addAll(timeVbox,ranking,dayVbox);
         upHBox.setStyle("-fx-font-size: 2em;-fx-font-weight: bold");
         splitPane2.getItems().addAll(upHBox,splitPane);
         splitPane2.getDividers().get( 0 ).positionProperty().addListener(

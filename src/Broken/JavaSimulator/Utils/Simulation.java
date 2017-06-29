@@ -231,21 +231,27 @@ public class Simulation {
                 System.err.println("[sim]No Drinks Offer for "+key.getID());
             }
 
-            for(int i = 0; i<value; i++){
-                //System.out.println("Ok For");
+            try {
+                Drink drink = key.getDrinksOffered().get(0);
+                float malus = drink.getPrice()/20;
+                System.out.println("[sim]Prob-malus: "+(todayProb-malus));
+                for(int i = 0; i<value; i++) {
+                    //System.out.println("Ok For");
 
-                if(Math.random()<=todayProb){
-                    System.out.println("[sim]Ok Probe");
-                    if(!sales.containsKey(key.getID())){
-                        try {
-                            sales.put(key.getID(),new Sale(key.getID(),key.getDrinksOffered().get(0).getName(),1));
-                        } catch (NoDrinkFound noDrinkFound) {System.err.println("[sim]No Drinks Offer for "+key.getID());}
+                    if (Math.random() <= todayProb) {
+                        //System.out.println("[sim]Ok Probe");
+                        if (!sales.containsKey(key.getID())) {
+                            sales.put(key.getID(), new Sale(key.getID(), drink.getName(), 1));
+                        } else
+                            sales.get(key.getID()).increment();
+
                     }
-                    else
-                        sales.get(key.getID()).increment();
-
                 }
+
+            } catch (NoDrinkFound noDrinkFound) {
+                System.err.println("[sim]No Drinks Offer for "+key.getID());
             }
+
             if(sales.containsKey(key.getID()))
                 System.out.println("[sim]After prob: "+sales.get(key.getID()).getPlayer()+" : "+sales.get(key.getID()).getQuantity());
             else
